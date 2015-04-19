@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
 import models.Bin;
 import models.Dimension;
 import models.Rectangle;
+import org.w3c.dom.css.Rect;
 
 /**
  * Created by Medric on 18/04/2015.
@@ -27,7 +29,7 @@ public class DataModel
     private FileReader fr;
 
     private Bin binPattern;
-    private HashMap<Rectangle, Integer> rectanglesMap;
+    private ArrayList<Rectangle> rectanglesMap;
 
     /**
      * Constructor
@@ -39,7 +41,7 @@ public class DataModel
         this.fr = new FileReader(file);
         this.br = new BufferedReader(this.fr);
 
-        this.rectanglesMap = new HashMap<Rectangle, Integer>();
+        this.rectanglesMap = new ArrayList<Rectangle>();
 
         this.fetch();
     }
@@ -50,19 +52,10 @@ public class DataModel
      */
     private void fetch() throws IOException
     {
-        try
-        {
-            this.fetchBinPattern();
-            this.fetchRectanglesMap();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            this.br.close();
-        }
+        this.fetchBinPattern();
+        this.fetchRectanglesMap();
+
+        this.br.close();
     }
 
     /**
@@ -117,7 +110,10 @@ public class DataModel
             Dimension dimension = new Dimension(Double.parseDouble(RECTANGLE_MATCHER.group(1)), Double.parseDouble(RECTANGLE_MATCHER.group(2)));
             Integer nb = Integer.parseInt(RECTANGLE_MATCHER.group(3));
 
-            this.rectanglesMap.put(new Rectangle(dimension), nb);
+            for(int i = 0; i < nb; i++)
+            {
+                this.rectanglesMap.add(new Rectangle(dimension));
+            }
         }
     }
 }

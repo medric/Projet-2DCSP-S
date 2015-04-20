@@ -5,7 +5,6 @@ package models;
  */
 public class Rectangle
 {
-
     Position position;
     Dimension dimension;
 

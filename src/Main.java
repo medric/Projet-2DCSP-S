@@ -14,8 +14,6 @@ public class Main
         try
         {
             DataModel dm = new DataModel(file);
-            
-            System.out.print("foo");
         }
         catch (IOException e)
         {

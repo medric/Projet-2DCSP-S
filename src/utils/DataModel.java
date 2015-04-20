@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import models.Bin;
 import models.Dimension;
 import models.Rectangle;
-import org.w3c.dom.css.Rect;
 
 /**
  * Created by Medric on 18/04/2015.
@@ -29,7 +28,7 @@ public class DataModel
     private FileReader fr;
 
     private Bin binPattern;
-    private ArrayList<Rectangle> rectanglesMap;
+    private HashMap<Rectangle, Integer> rectanglesMap;
 
     /**
      * Constructor
@@ -41,7 +40,7 @@ public class DataModel
         this.fr = new FileReader(file);
         this.br = new BufferedReader(this.fr);
 
-        this.rectanglesMap = new ArrayList<Rectangle>();
+        this.rectanglesMap = new HashMap<Rectangle, Integer>();
 
         this.fetch();
     }
@@ -98,22 +97,17 @@ public class DataModel
     {
         String sCurrentLine;
 
-        while ((sCurrentLine = this.br.readLine()) != null)
-        {
+        while ((sCurrentLine = this.br.readLine()) != null) {
             RECTANGLE_MATCHER.reset(sCurrentLine); //reset the input
 
-            if (!RECTANGLE_MATCHER.find())
-            {
+            if (!RECTANGLE_MATCHER.find()) {
                 throw new IllegalStateException();
             }
 
             Dimension dimension = new Dimension(Double.parseDouble(RECTANGLE_MATCHER.group(1)), Double.parseDouble(RECTANGLE_MATCHER.group(2)));
             Integer nb = Integer.parseInt(RECTANGLE_MATCHER.group(3));
 
-            for(int i = 0; i < nb; i++)
-            {
-                this.rectanglesMap.add(new Rectangle(dimension));
-            }
+            this.rectanglesMap.put(new Rectangle(dimension), nb);
         }
     }
 }

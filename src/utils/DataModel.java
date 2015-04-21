@@ -7,7 +7,11 @@ import java.util.regex.Pattern;
 
 import models.Bin;
 import models.Dimension;
+<<<<<<< HEAD
 import models.ItemPattern;
+=======
+import models.Rectangle;
+>>>>>>> f579d628a3e916f4acf25cd93e709102c097f1fd
 
 /**
  * Created by Medric on 18/04/2015.
@@ -40,7 +44,6 @@ public class DataModel
         this.br = new BufferedReader(this.fr);
 
         this.itemsMap = new ArrayList<ItemPattern>();
-
         this.fetch();
     }
 
@@ -96,12 +99,10 @@ public class DataModel
     {
         String sCurrentLine;
 
-        while ((sCurrentLine = this.br.readLine()) != null)
-        {
+        while ((sCurrentLine = this.br.readLine()) != null) {
             RECTANGLE_MATCHER.reset(sCurrentLine); //reset the input
 
-            if (!RECTANGLE_MATCHER.find())
-            {
+            if (!RECTANGLE_MATCHER.find()) {
                 throw new IllegalStateException();
             }
 

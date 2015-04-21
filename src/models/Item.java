@@ -3,15 +3,19 @@ package models;
 /**
  * Created by Medric on 18/04/2015.
  */
-public class Rectangle
+public class Item
 {
-
     Position position;
     Dimension dimension;
 
-    public Rectangle(Dimension dimension)
+    public Item(Dimension dimension)
     {
         this.setDimension(dimension);
+    }
+
+    public Item(ItemPattern pattern)
+    {
+        this.setDimension(pattern.getDimension());
     }
 
     public Position getPosition() {

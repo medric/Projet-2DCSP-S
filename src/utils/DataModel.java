@@ -2,14 +2,12 @@ package utils;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import models.Bin;
 import models.Dimension;
-import models.Rectangle;
-import org.w3c.dom.css.Rect;
+import models.ItemPattern;
 
 /**
  * Created by Medric on 18/04/2015.
@@ -29,7 +27,7 @@ public class DataModel
     private FileReader fr;
 
     private Bin binPattern;
-    private ArrayList<Rectangle> rectanglesMap;
+    private ArrayList<ItemPattern> itemsMap;
 
     /**
      * Constructor
@@ -41,7 +39,7 @@ public class DataModel
         this.fr = new FileReader(file);
         this.br = new BufferedReader(this.fr);
 
-        this.rectanglesMap = new ArrayList<Rectangle>();
+        this.itemsMap = new ArrayList<ItemPattern>();
 
         this.fetch();
     }
@@ -108,12 +106,36 @@ public class DataModel
             }
 
             Dimension dimension = new Dimension(Double.parseDouble(RECTANGLE_MATCHER.group(1)), Double.parseDouble(RECTANGLE_MATCHER.group(2)));
-            Integer nb = Integer.parseInt(RECTANGLE_MATCHER.group(3));
+            Integer amount = Integer.parseInt(RECTANGLE_MATCHER.group(3));
 
-            for(int i = 0; i < nb; i++)
-            {
-                this.rectanglesMap.add(new Rectangle(dimension));
-            }
+            this.itemsMap.add(new ItemPattern(dimension, amount));
         }
+    }
+
+    /**
+     * Returns current BinPattern
+     * @return
+     */
+    public Bin getBinPattern()
+    {
+        return binPattern;
+    }
+
+    /**
+     * Sets current binPattern
+     * @param binPattern
+     */
+    public void setBinPattern(Bin binPattern)
+    {
+        this.binPattern = binPattern;
+    }
+
+    /**
+     * Returns current ItemPattern List
+     * @return
+     */
+    public ArrayList<ItemPattern> getItemPattern()
+    {
+        return this.itemsMap;
     }
 }

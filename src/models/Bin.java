@@ -9,7 +9,7 @@ public class Bin
 {
     private Dimension dimension;
     private double cost;
-    private List<Rectangle> rectangles;
+    private List<Item> items;
 
     public Bin(Dimension dimension, double cost)
     {

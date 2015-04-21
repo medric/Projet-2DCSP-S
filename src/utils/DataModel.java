@@ -7,11 +7,7 @@ import java.util.regex.Pattern;
 
 import models.Bin;
 import models.Dimension;
-<<<<<<< HEAD
 import models.ItemPattern;
-=======
-import models.Rectangle;
->>>>>>> f579d628a3e916f4acf25cd93e709102c097f1fd
 
 /**
  * Created by Medric on 18/04/2015.

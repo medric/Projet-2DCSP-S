@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import models.Bin;
 import models.Dimension;
-import models.ItemPattern;
+import models.Rectangle;
 
 /**
  * Created by Medric on 18/04/2015.
@@ -26,11 +26,11 @@ public class DataModel
     private BufferedReader br;
     private FileReader fr;
 
-    private Bin binPattern;
-    private ArrayList<ItemPattern> itemsMap;
+    private Bin bin;
+    private ArrayList<Rectangle> rectangles;
 
     /**
-     * Constructor
+     * Constructor.
      * @param file
      * @throws FileNotFoundException
      */
@@ -39,29 +39,29 @@ public class DataModel
         this.fr = new FileReader(file);
         this.br = new BufferedReader(this.fr);
 
-        this.itemsMap = new ArrayList<ItemPattern>();
+        this.rectangles = new ArrayList<Rectangle>();
         this.fetch();
     }
 
     /**
-     * Fetches data from the given data file
+     * Fetches data from the given data file.
      * @throws IOException
      */
     private void fetch() throws IOException
     {
-        this.fetchBinPattern();
-        this.fetchRectanglesMap();
+        this.fetchBin();
+        this.fetchItems();
 
         this.br.close();
     }
 
     /**
-     * Reads the lines that allow us to create a new Bin Object
+     * Reads the lines that allow us to create a new Bin Object.
      * If a line is not of the expected pattern, then an
      * IllegalStateException is thrown.
      * @throws IOException
      */
-    private void fetchBinPattern() throws IOException
+    private void fetchBin() throws IOException
     {
         String sCurrentLine;
         String header = "";
@@ -82,57 +82,59 @@ public class DataModel
         Dimension dimension = new Dimension(Double.parseDouble(BIN_MATCHER.group(1)), Double.parseDouble(BIN_MATCHER.group(2)));
         Double cost = Double.parseDouble(BIN_MATCHER.group(3));
 
-        this.binPattern = new Bin(dimension, cost);
+        this.bin = new Bin(dimension, cost);
     }
 
     /**
-     * Reads the lines that allow us to create a Map of rectangles
+     * Reads the lines that allow us to create a Map of rectangles.
      * If a line is not of the expected pattern, then an
      * IllegalStateException is thrown.
      * @throws IOException
      */
-    private void fetchRectanglesMap() throws IOException
+    private void fetchItems() throws IOException
     {
         String sCurrentLine;
 
-        while ((sCurrentLine = this.br.readLine()) != null) {
+        while ((sCurrentLine = this.br.readLine()) != null)
+        {
             RECTANGLE_MATCHER.reset(sCurrentLine); //reset the input
 
-            if (!RECTANGLE_MATCHER.find()) {
+            if (!RECTANGLE_MATCHER.find())
+            {
                 throw new IllegalStateException();
             }
 
             Dimension dimension = new Dimension(Double.parseDouble(RECTANGLE_MATCHER.group(1)), Double.parseDouble(RECTANGLE_MATCHER.group(2)));
             Integer amount = Integer.parseInt(RECTANGLE_MATCHER.group(3));
 
-            this.itemsMap.add(new ItemPattern(dimension, amount));
+            this.rectangles.add(new Rectangle(dimension, amount));
         }
     }
 
     /**
-     * Returns current BinPattern
+     * Returns current Bin.
      * @return
      */
-    public Bin getBinPattern()
+    public Bin getBin()
     {
-        return binPattern;
+        return bin;
     }
 
     /**
-     * Sets current binPattern
-     * @param binPattern
+     * Sets current Bin.
+     * @param bin
      */
-    public void setBinPattern(Bin binPattern)
+    public void setBin(Bin bin)
     {
-        this.binPattern = binPattern;
+        this.bin = bin;
     }
 
     /**
-     * Returns current ItemPattern List
+     * Returns current Items List.
      * @return
      */
-    public ArrayList<ItemPattern> getItemPattern()
+    public ArrayList<Rectangle> getRectangles()
     {
-        return this.itemsMap;
+        return this.rectangles;
     }
 }

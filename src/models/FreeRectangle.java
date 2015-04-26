@@ -22,10 +22,20 @@ public class FreeRectangle extends Rectangle
 
     /**
      *
+     * @return
+     */
+    public Rectangle getPackedRectangle()
+    {
+        return packedRectangle;
+    }
+
+    /**
+     *
      * @param rectangle
      */
     public void setPackedRectangle(Rectangle rectangle)
     {
         this.packedRectangle = rectangle;
     }
+
 }

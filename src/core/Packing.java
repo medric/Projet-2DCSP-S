@@ -64,7 +64,7 @@ public class Packing
         {
             FreeRectangle freeRectangle = this.findFreeRectangle(rectangle, null, 0, 0);
 
-            this.update(rectangle, freeRectangle);
+            this.update(rectangle, freeRectangle); // Persist freeRectangle
         }
     }
 
@@ -155,14 +155,25 @@ public class Packing
     }
 
     /**
-     *
+     * Splits.
      * @param freeRectangle
      */
     private void split(FreeRectangle freeRectangle)
     {
-        ArrayList<FreeRectangle> freeRectangles = new ArrayList<FreeRectangle>();
+        double deltaLX, deltaLY;
 
-        
+        deltaLX = freeRectangle.getDimension().getLX() - freeRectangle.getPackedRectangle().getDimension().getLX();
+        deltaLY = freeRectangle.getDimension().getLY() - freeRectangle.getPackedRectangle().getDimension().getLY();
+
+        // Shorter Leftover Axis Split Rule (-SLAS).
+        if(deltaLX < deltaLY)
+        {
+            this.splitHorizontally();
+        }
+        else
+        {
+            this.splitVertically();
+        }
     }
 
     private void splitVertically()

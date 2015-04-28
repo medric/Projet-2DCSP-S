@@ -37,6 +37,11 @@ public class Bin
         this.freeRectangles.add(rectangle);
     }
 
+    public void updateFreeRectangles(FreeRectangle rectangle)
+    {
+        this.freeRectangles.remove(rectangle);
+    }
+
     /**
      * Copy constructor.
      */

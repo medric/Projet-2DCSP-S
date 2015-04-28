@@ -1,23 +1,20 @@
 package core;
 
-import models.Bin;
-import models.FreeRectangle;
-import models.Rectangle;
+import models.*;
 
 import java.util.ArrayList;
 
 
 /**
  * Packing class.
- *
+ * <p>
  * Implements a Guillotine algorithm to pack a
  * sequence of rectangles into bins.
  *
  * @author Medric
  * @version 1.0
  */
-public class Packing
-{
+public class Packing {
     private ArrayList<Rectangle> rectangles;
     private ArrayList<Bin> bins;
     private Bin currentBin;
@@ -28,12 +25,10 @@ public class Packing
     }
 
     /**
-     *
      * @param rectangles
      * @param bin
      */
-    public Packing(ArrayList<Rectangle> rectangles, Bin bin)
-    {
+    public Packing(ArrayList<Rectangle> rectangles, Bin bin) {
         // Initializes the sequence of rectangles.
         this.setRectangles(rectangles);
 
@@ -42,11 +37,9 @@ public class Packing
 
 
     /**
-     *
      * @param bin
      */
-    private void initBins(Bin bin)
-    {
+    private void initBins(Bin bin) {
         // Initializes the list of bins and add the given bin to it.
         this.bins = new ArrayList<Bin>();
 
@@ -57,11 +50,9 @@ public class Packing
     /**
      *
      */
-    public void pack()
-    {
+    public void pack() {
         // Iterates the collection of rectangles to be packed.
-        for(Rectangle rectangle : this.rectangles)
-        {
+        for (Rectangle rectangle : this.rectangles) {
             FreeRectangle freeRectangle = this.findFreeRectangle(rectangle, null, 0, 0);
 
             this.update(rectangle, freeRectangle); // Persist freeRectangle
@@ -79,19 +70,16 @@ public class Packing
      * @param maxLeftOverArea
      * @return
      */
-    private FreeRectangle findFreeRectangle(Rectangle rectangle, FreeRectangle freeRectangle, int index, double maxLeftOverArea)
-    {
+    private FreeRectangle findFreeRectangle(Rectangle rectangle, FreeRectangle freeRectangle, int index, double maxLeftOverArea) {
         FreeRectangle currentFreeRectangle = this.currentBin.getFreeRectangles().get(index);
         double remainingArea = currentFreeRectangle.getArea() - rectangle.getArea();
 
         // Ends recursion.
-        if(index == this.currentBin.getFreeRectangles().size() - 1 || rectangle.sameAs(currentFreeRectangle))
-        {
+        if (index == this.currentBin.getFreeRectangles().size() - 1 || rectangle.sameAs(currentFreeRectangle)) {
             return freeRectangle;
         }
 
-        if(remainingArea > maxLeftOverArea)
-        {
+        if (remainingArea > maxLeftOverArea) {
             this.findFreeRectangle(rectangle, currentFreeRectangle, index++, remainingArea);
         }
 
@@ -103,27 +91,21 @@ public class Packing
     /**
      *
      */
-    private void merge()
-    {
+    private void merge() {
 
     }
 
     /**
-     *
      * @param rectangle
      * @param freeRectangle
      */
-    private void update(Rectangle rectangle, FreeRectangle freeRectangle)
-    {
-        if(freeRectangle == null)
-        {
+    private void update(Rectangle rectangle, FreeRectangle freeRectangle) {
+        if (freeRectangle == null) {
             this.bins.add(this.currentBin);
 
             // Call copy constructor to get a new identical Bin.
             this.currentBin = new Bin(this.currentBin);
-        }
-        else
-        {
+        } else {
             // Decides the orientation for the rectangle.
             this.orientate(rectangle, freeRectangle);
 
@@ -137,61 +119,68 @@ public class Packing
     }
 
     /**
-     *
      * @param rectangle
      * @param freeRectangle
      */
-    private void orientate(Rectangle rectangle, FreeRectangle freeRectangle)
-    {
+    private void orientate(Rectangle rectangle, FreeRectangle freeRectangle) {
         double deltaLX, deltaLY;
 
         deltaLX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
         deltaLY = freeRectangle.getDimension().getLY() - rectangle.getDimension().getLY();
 
-        if(deltaLX < 0 || deltaLY < 0)
-        {
+        if (deltaLX < 0 || deltaLY < 0) {
             rectangle.rotate();
         }
     }
 
     /**
      * Splits.
+     *
      * @param freeRectangle
      */
-    private void split(FreeRectangle freeRectangle)
-    {
+    private void split(FreeRectangle freeRectangle) {
         double deltaLX, deltaLY;
 
         deltaLX = freeRectangle.getDimension().getLX() - freeRectangle.getPackedRectangle().getDimension().getLX();
         deltaLY = freeRectangle.getDimension().getLY() - freeRectangle.getPackedRectangle().getDimension().getLY();
 
         // Shorter Leftover Axis Split Rule (-SLAS).
-        if(deltaLX < deltaLY)
-        {
+        if (deltaLX < deltaLY) {
             this.splitHorizontally();
-        }
-        else
-        {
-            this.splitVertically();
+        } else {
+            this.splitVertically(freeRectangle);
         }
     }
 
-    private void splitVertically()
-    {
+    private void splitVertically(FreeRectangle freeRectangle) {
+        FreeRectangle freeRectanglePrime;
+        FreeRectangle freeRectangleSecond;
 
+        double x1 = freeRectangle.getPackedRectangle().getPosition().getX() + freeRectangle.getPackedRectangle().getDimension().getLX();
+        double y1 = freeRectangle.getPackedRectangle().getPosition().getY();
+
+        double LX = freeRectangle.getDimension().getLX() - freeRectangle.getPackedRectangle().getDimension().getLX();
+        double LY = freeRectangle.getDimension().getLY();
+
+        freeRectanglePrime = new FreeRectangle(new Dimension(LX, LY), new Position(x1, y1));
+
+        x1 = freeRectangle.getPackedRectangle().getPosition().getX();
+        y1 = freeRectangle.getPackedRectangle().getPosition().getY() + freeRectangle.getPackedRectangle().getDimension().getLY();
+
+        LX = freeRectangle.getDimension().getLX();
+        LY = freeRectangle.getDimension().getLY() - freeRectangle.getPackedRectangle().getDimension().getLY();
+
+        freeRectangleSecond = new FreeRectangle(new Dimension(LX, LY), new Position(x1, y1));
     }
 
-    private void splitHorizontally()
-    {
+    private void splitHorizontally() {
 
     }
 
     /**
-     *
      * @param rectangles
      */
-    public void setRectangles(ArrayList<Rectangle> rectangles)
-    {
+    public void setRectangles(ArrayList<Rectangle> rectangles) {
         this.rectangles = rectangles;
     }
 }

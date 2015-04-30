@@ -50,7 +50,7 @@ public class DataModel
     private void fetch() throws IOException
     {
         this.fetchBin();
-        this.fetchItems();
+        this.fetchRectangles();
 
         this.br.close();
     }
@@ -91,7 +91,7 @@ public class DataModel
      * IllegalStateException is thrown.
      * @throws IOException
      */
-    private void fetchItems() throws IOException
+    private void fetchRectangles() throws IOException
     {
         String sCurrentLine;
 

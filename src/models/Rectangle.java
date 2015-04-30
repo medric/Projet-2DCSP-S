@@ -1,5 +1,7 @@
 package models;
 
+import javafx.geometry.Pos;
+
 /**
  * Created by Medric on 18/04/2015.
  */
@@ -21,6 +23,16 @@ public class Rectangle
     public Rectangle(Dimension dimension)
     {
         this.setDimension(dimension);
+    }
+
+    /**
+     * Override constructor.
+     * @param dimension
+     */
+    public Rectangle(Dimension dimension, Position position)
+    {
+        this.setDimension(dimension);
+        this.setPosition(position);
     }
 
     /**

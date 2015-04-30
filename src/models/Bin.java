@@ -1,5 +1,7 @@
 package models;
 
+import org.w3c.dom.css.Rect;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,8 @@ public class Bin
 {
     private Dimension dimension;
     private double cost;
-    private List<FreeRectangle> freeRectangles;
+    private List<Rectangle> freeRectangles;
+    private List<Rectangle> rectangles;
 
     /**
      *
@@ -31,15 +34,67 @@ public class Bin
     private void initFreeRectangles()
     {
         // Initializes the list of free rectangles.
-        this.freeRectangles = new ArrayList<FreeRectangle>();
+        this.freeRectangles = new ArrayList<Rectangle>();
 
-        FreeRectangle rectangle = new FreeRectangle(this.getDimension(), new Position(0, 0));
+        Rectangle rectangle = new Rectangle(this.getDimension(), new Position(0, 0));
         this.freeRectangles.add(rectangle);
     }
 
-    public void updateFreeRectangles(FreeRectangle rectangle)
-    {
-        this.freeRectangles.remove(rectangle);
+
+    /**
+     * Updates free rectangles of the current bin.
+     * @param freeRectangle
+     * @param firstSubFreeRectangle
+     * @param secondSubFreeRectangle
+     */
+    private void updateBinsFreeRectangles(Rectangle freeRectangle, Rectangle firstSubFreeRectangle, Rectangle secondSubFreeRectangle) {
+        // Removes the current free rectangle.
+        this.removeFreeRectangle(freeRectangle);
+
+        // Adds new subdivided free rectangles.
+        this.addFreeRectangle(firstSubFreeRectangle);
+        this.addFreeRectangle(secondSubFreeRectangle);
+    }
+
+    /**
+     *
+     * @param rectangle
+     * @param freeRectangle
+     * @param splitDirection
+     */
+    public void splitFreeRectangle(Rectangle rectangle, Rectangle freeRectangle, Direction splitDirection) {
+        Rectangle firstSubFreeRectangle;
+        Rectangle secondSubFreeRectangle;
+
+        // firstSubFreeRectangle
+        double x1 = freeRectangle.getPosition().getX() + rectangle.getDimension().getLX();
+        double y1 = freeRectangle.getPosition().getY();
+
+        double LX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
+        double LY = freeRectangle.getDimension().getLY();
+
+        if(splitDirection.equals(Direction.HORIZONTAL)) {
+
+            LY -= rectangle.getDimension().getLY();
+        }
+
+        firstSubFreeRectangle = new Rectangle(new Dimension(LX, LY), new Position(x1, y1));
+
+        // secondSubFreeRectangle
+        x1 = freeRectangle.getPosition().getX();
+        y1 = freeRectangle.getPosition().getY() + rectangle.getDimension().getLY();
+
+        if(splitDirection.equals(Direction.HORIZONTAL)) {
+
+            LX = freeRectangle.getDimension().getLX();
+        }
+
+        LY = freeRectangle.getDimension().getLY() - rectangle.getDimension().getLY();
+
+        secondSubFreeRectangle = new Rectangle(new Dimension(LX, LY), new Position(x1, y1));
+
+        // Update free rectangles collection.
+        this.updateBinsFreeRectangles(freeRectangle, firstSubFreeRectangle, secondSubFreeRectangle);
     }
 
     /**
@@ -90,8 +145,24 @@ public class Bin
      *
      * @return
      */
-    public List<FreeRectangle> getFreeRectangles()
+    public List<Rectangle> getFreeRectangles()
     {
         return freeRectangles;
+    }
+
+    /**
+     * Add free rectangle to the current bin.
+     * @param rectangle
+     */
+    public void addFreeRectangle(Rectangle rectangle) {
+        this.freeRectangles.add(rectangle);
+    }
+
+    /**
+     * Remove free rectangle from the current bin.
+     * @param rectangle
+     */
+    public void removeFreeRectangle(Rectangle rectangle) {
+        this.freeRectangles.remove(rectangle);
     }
 }

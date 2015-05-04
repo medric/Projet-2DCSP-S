@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class Packing {
     private ArrayList<Rectangle> rectangles;
-    private ArrayList<Bin> bins;
+    public ArrayList<Bin> bins;
     private Bin currentBin;
 
     /**
@@ -40,22 +40,30 @@ public class Packing {
 
         // Init current Bin.
         this.currentBin = bin;
+
+        this.bins.add(this.currentBin);
     }
 
     /**
      *
      */
     public void pack() {
-        Rectangle maximized = null;
+        Rectangle maximized;
+        Rectangle freeRectangle;
 
+        int i = 0;
         // Iterates the collection of rectangles to be packed.
         for (Rectangle rectangle : this.rectangles) {
+            maximized = null;
 
-            // For each opened bin in bins.
-            for(Bin bin : this.bins) {
-                Rectangle freeRectangle = this.findFreeRectangle(rectangle, null, 0, 0);
+            // For each opened bin.
+            for (Bin bin : this.bins) {
+                freeRectangle = this.findFreeRectangle(bin, rectangle, null, 0, 0);
 
-                if(maximized != null && maximized.getArea() < freeRectangle.getArea()) {
+                if(freeRectangle == null) {
+                    maximized = null;
+                }
+                else if (maximized == null || (maximized.getArea() < freeRectangle.getArea())) {
                     maximized = freeRectangle;
                 }
             }
@@ -76,20 +84,20 @@ public class Packing {
      * @param maxLeftOverArea
      * @return
      */
-    private Rectangle findFreeRectangle(Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) {
+    private Rectangle findFreeRectangle(Bin bin, Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) {
 
         // End of collections reached.
-        if(!(index == this.currentBin.getFreeRectangles().size())) {
+        if (!(index == bin.getFreeRectangles().size())) {
 
-            Rectangle currentFreeRectangle = this.currentBin.getFreeRectangles().get(index);
+            Rectangle currentFreeRectangle = bin.getFreeRectangles().get(index);
             double leftOverArea = currentFreeRectangle.getArea() - rectangle.getArea();
 
             if (!rectangle.sameAs(currentFreeRectangle)) {
 
                 if (leftOverArea > maxLeftOverArea) {
-                    freeRectangle = this.findFreeRectangle(rectangle, currentFreeRectangle, ++index, leftOverArea);
+                    freeRectangle = this.findFreeRectangle(bin, rectangle, currentFreeRectangle, ++index, leftOverArea);
                 } else {
-                    freeRectangle = this.findFreeRectangle(rectangle, freeRectangle, ++index, maxLeftOverArea);
+                    freeRectangle = this.findFreeRectangle(bin, rectangle, freeRectangle, ++index, maxLeftOverArea);
                 }
             }
         }
@@ -111,13 +119,14 @@ public class Packing {
      */
     private void update(Rectangle rectangle, Rectangle freeRectangle) {
         if (freeRectangle == null) {
-            this.bins.add(this.currentBin);
 
             // Call copy constructor to get a new identical Bin.
             this.currentBin = new Bin(this.currentBin);
 
-            // Get first free rectangle of the new current bin.
+            // Get the first free rectangle of the new current bin.
             freeRectangle = this.currentBin.getFreeRectangles().get(0);
+
+            if(!this.bins.contains(this.currentBin)) this.bins.add(this.currentBin);
         }
 
         // Decides the orientation for the rectangle.
@@ -125,10 +134,10 @@ public class Packing {
 
         // Places it.
         rectangle.setPosition(freeRectangle.getPosition());
+        this.currentBin.addRectangle(rectangle);
 
         // Guillotine split to subdivide Fi into F' and F''
-        this.split(freeRectangle, rectangle);
-
+        this.split(rectangle, freeRectangle);
     }
 
     /**

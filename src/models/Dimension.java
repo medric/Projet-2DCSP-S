@@ -3,19 +3,16 @@ package models;
 /**
  * Created by Medric on 18/04/2015.
  */
-public class Dimension
-{
+public class Dimension {
 
     private double LX;
     private double LY;
 
     /**
-     *
      * @param LX
      * @param LY
      */
-    public Dimension(double LX, double LY)
-    {
+    public Dimension(double LX, double LY) {
         this.setLX(LX);
         this.setLY(LY);
     }
@@ -23,46 +20,37 @@ public class Dimension
     /**
      * Reverses LX / LY.
      */
-    public void reverse()
-    {
+    public void reverse() {
         double LX = this.getLX();
         this.setLX(this.getLY());
         this.setLY(LX);
     }
 
     /**
-     *
      * @return
      */
-    public double getLX()
-    {
+    public double getLX() {
         return LX;
     }
 
     /**
-     *
      * @param LX
      */
-    public void setLX(double LX)
-    {
+    public void setLX(double LX) {
         this.LX = LX;
     }
 
     /**
-     *
      * @return
      */
-    public double getLY()
-    {
+    public double getLY() {
         return LY;
     }
 
     /**
-     *
      * @param LY
      */
-    public void setLY(double LY)
-    {
+    public void setLY(double LY) {
         this.LY = LY;
     }
 }

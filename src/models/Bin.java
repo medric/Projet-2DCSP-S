@@ -8,31 +8,28 @@ import java.util.List;
 /**
  * Created by Medric on 18/04/2015.
  */
-public class Bin
-{
+public class Bin {
     private Dimension dimension;
     private double cost;
     private List<Rectangle> freeRectangles;
     private List<Rectangle> rectangles;
 
     /**
-     *
      * @param dimension
      * @param cost
      */
-    public Bin(Dimension dimension, double cost)
-    {
+    public Bin(Dimension dimension, double cost) {
         this.setDimension(dimension);
         this.setCost(cost);
 
         this.initFreeRectangles();
+        this.rectangles = new ArrayList<Rectangle>();
     }
 
     /**
      *
      */
-    private void initFreeRectangles()
-    {
+    private void initFreeRectangles() {
         // Initializes the list of free rectangles.
         this.freeRectangles = new ArrayList<Rectangle>();
 
@@ -43,6 +40,7 @@ public class Bin
 
     /**
      * Updates free rectangles of the current bin.
+     *
      * @param freeRectangle
      * @param firstSubFreeRectangle
      * @param secondSubFreeRectangle
@@ -57,7 +55,6 @@ public class Bin
     }
 
     /**
-     *
      * @param rectangle
      * @param freeRectangle
      * @param splitDirection
@@ -73,7 +70,7 @@ public class Bin
         double LX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
         double LY = freeRectangle.getDimension().getLY();
 
-        if(splitDirection.equals(Direction.HORIZONTAL)) {
+        if (splitDirection.equals(Direction.HORIZONTAL)) {
 
             LY -= rectangle.getDimension().getLY();
         }
@@ -84,7 +81,7 @@ public class Bin
         x1 = freeRectangle.getPosition().getX();
         y1 = freeRectangle.getPosition().getY() + rectangle.getDimension().getLY();
 
-        if(splitDirection.equals(Direction.HORIZONTAL)) {
+        if (splitDirection.equals(Direction.HORIZONTAL)) {
 
             LX = freeRectangle.getDimension().getLX();
         }
@@ -100,58 +97,56 @@ public class Bin
     /**
      * Copy constructor.
      */
-    public Bin(Bin bin)
-    {
+    public Bin(Bin bin) {
         this(bin.getDimension(), bin.getCost());
     }
 
     /**
-     *
      * @return
      */
-    public double getCost()
-    {
+    public double getCost() {
         return cost;
     }
 
     /**
-     *
      * @param cost
      */
-    public void setCost(double cost)
-    {
+    public void setCost(double cost) {
         this.cost = cost;
     }
 
     /**
-     *
      * @return
      */
-    public Dimension getDimension()
-    {
+    public Dimension getDimension() {
         return dimension;
     }
 
     /**
-     *
      * @param dimension
      */
-    public void setDimension(Dimension dimension)
-    {
+    public void setDimension(Dimension dimension) {
         this.dimension = dimension;
+    }
+
+    /**
+     * @return
+     */
+    public List<Rectangle> getFreeRectangles() {
+        return freeRectangles;
     }
 
     /**
      *
      * @return
      */
-    public List<Rectangle> getFreeRectangles()
-    {
-        return freeRectangles;
+    public List<Rectangle> getRectangles() {
+        return rectangles;
     }
 
     /**
      * Add free rectangle to the current bin.
+     *
      * @param rectangle
      */
     public void addFreeRectangle(Rectangle rectangle) {
@@ -160,9 +155,15 @@ public class Bin
 
     /**
      * Remove free rectangle from the current bin.
+     *
      * @param rectangle
      */
     public void removeFreeRectangle(Rectangle rectangle) {
         this.freeRectangles.remove(rectangle);
+    }
+
+
+    public void addRectangle(Rectangle rectangle) {
+        this.rectangles.add(rectangle);
     }
 }

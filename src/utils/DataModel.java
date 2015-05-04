@@ -12,8 +12,7 @@ import models.Rectangle;
 /**
  * Created by Medric on 18/04/2015.
  */
-public class DataModel
-{
+public class DataModel {
     // Regex
     private static final Pattern BIN_REGEX = Pattern.compile("LX=(\\d+)\\s*LY=(\\d+)\\s*m=(\\d+)\\s*");
     private static final Pattern RECTANGLE_REGEX = Pattern.compile("(\\d+.\\d+)\\s*(\\d+.\\d+)\\s*(\\d+)");
@@ -31,11 +30,11 @@ public class DataModel
 
     /**
      * Constructor.
+     *
      * @param file
      * @throws FileNotFoundException
      */
-    public DataModel(File file) throws IOException
-    {
+    public DataModel(File file) throws IOException {
         this.fr = new FileReader(file);
         this.br = new BufferedReader(this.fr);
 
@@ -45,10 +44,10 @@ public class DataModel
 
     /**
      * Fetches data from the given data file.
+     *
      * @throws IOException
      */
-    private void fetch() throws IOException
-    {
+    private void fetch() throws IOException {
         this.fetchBin();
         this.fetchRectangles();
 
@@ -59,23 +58,21 @@ public class DataModel
      * Reads the lines that allow us to create a new Bin Object.
      * If a line is not of the expected pattern, then an
      * IllegalStateException is thrown.
+     *
      * @throws IOException
      */
-    private void fetchBin() throws IOException
-    {
+    private void fetchBin() throws IOException {
         String sCurrentLine;
         String header = "";
 
-        for(int i = 0; i < BIN_PARAMS_LENGTH; i++)
-        {
+        for (int i = 0; i < BIN_PARAMS_LENGTH; i++) {
             sCurrentLine = this.br.readLine();
             header += (sCurrentLine);
         }
 
         BIN_MATCHER.reset(header); //reset the input
 
-        if(!BIN_MATCHER.find())
-        {
+        if (!BIN_MATCHER.find()) {
             throw new IllegalStateException();
         }
 
@@ -89,18 +86,16 @@ public class DataModel
      * Reads the lines that allow us to create a Map of rectangles.
      * If a line is not of the expected pattern, then an
      * IllegalStateException is thrown.
+     *
      * @throws IOException
      */
-    private void fetchRectangles() throws IOException
-    {
+    private void fetchRectangles() throws IOException {
         String sCurrentLine;
 
-        while ((sCurrentLine = this.br.readLine()) != null)
-        {
+        while ((sCurrentLine = this.br.readLine()) != null) {
             RECTANGLE_MATCHER.reset(sCurrentLine); //reset the input
 
-            if (!RECTANGLE_MATCHER.find())
-            {
+            if (!RECTANGLE_MATCHER.find()) {
                 throw new IllegalStateException();
             }
 
@@ -113,28 +108,28 @@ public class DataModel
 
     /**
      * Returns current Bin.
+     *
      * @return
      */
-    public Bin getBin()
-    {
+    public Bin getBin() {
         return bin;
     }
 
     /**
      * Sets current Bin.
+     *
      * @param bin
      */
-    public void setBin(Bin bin)
-    {
+    public void setBin(Bin bin) {
         this.bin = bin;
     }
 
     /**
      * Returns current Items List.
+     *
      * @return
      */
-    public ArrayList<Rectangle> getRectangles()
-    {
+    public ArrayList<Rectangle> getRectangles() {
         return this.rectangles;
     }
 }

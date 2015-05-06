@@ -5,7 +5,7 @@ import javafx.geometry.Pos;
 /**
  * Created by Medric on 18/04/2015.
  */
-public class Rectangle {
+public class Rectangle implements Comparable<Rectangle> {
     protected Position position;
     protected Dimension dimension;
     protected Integer amount;
@@ -114,5 +114,30 @@ public class Rectangle {
      */
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public int compareTo(Rectangle rectangle) {
+        int result = this.isSuitable(rectangle);
+
+        if(result == 1) {
+            rectangle.rotate();
+            result = this.isSuitable(rectangle);
+            rectangle.rotate();
+        }
+
+        return result;
+    }
+
+    private int isSuitable(Rectangle rectangle) {
+        int result = 1;
+
+        if(this.getDimension().getLX() > rectangle.getDimension().getLX() && this.getDimension().getLY() > rectangle.getDimension().getLY()) {
+            result = -1;
+        } else if (this.getDimension().getLX() == rectangle.getDimension().getLX() && this.getDimension().getLY() == rectangle.getDimension().getLY()) {
+            result = 0;
+        }
+
+        return  result;
     }
 }

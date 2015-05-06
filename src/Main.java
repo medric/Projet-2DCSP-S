@@ -1,3 +1,4 @@
+import models.Rectangle;
 import utils.DataModel;
 
 import java.io.File;
@@ -10,7 +11,7 @@ import core.Packing;
  */
 public class Main {
     public static void main(String[] args) {
-        File file = new File("./data/data_50Valpha.txt");
+        File file = new File("./data/data_20Lalpha.txt");
 
         try {
             DataModel dm = new DataModel(file);
@@ -18,14 +19,7 @@ public class Main {
             Packing packing = new Packing(dm.getRectangles(), dm.getBin()); // Pack
 
             packing.pack();
-
-            int nb= 0;
-
-            for(int i = 0; i < packing.bins.size(); i++) {
-                nb += packing.bins.get(i).getRectangles().size();
-            }
-
-            System.out.print(nb);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }

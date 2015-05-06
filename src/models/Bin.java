@@ -81,9 +81,9 @@ public class Bin {
         x1 = freeRectangle.getPosition().getX();
         y1 = freeRectangle.getPosition().getY() + rectangle.getDimension().getLY();
 
-        if (splitDirection.equals(Direction.HORIZONTAL)) {
+        if (splitDirection.equals(Direction.VERTICAL)) {
 
-            LX = freeRectangle.getDimension().getLX();
+            LX = rectangle.getDimension().getLX();
         }
 
         LY = freeRectangle.getDimension().getLY() - rectangle.getDimension().getLY();

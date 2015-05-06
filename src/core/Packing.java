@@ -51,7 +51,6 @@ public class Packing {
         Rectangle maximized;
         Rectangle freeRectangle;
 
-        int i = 0;
         // Iterates the collection of rectangles to be packed.
         for (Rectangle rectangle : this.rectangles) {
             maximized = null;
@@ -60,10 +59,8 @@ public class Packing {
             for (Bin bin : this.bins) {
                 freeRectangle = this.findFreeRectangle(bin, rectangle, null, 0, 0);
 
-                if(freeRectangle == null) {
-                    maximized = null;
-                }
-                else if (maximized == null || (maximized.getArea() < freeRectangle.getArea())) {
+                if (maximized == null || (freeRectangle != null && (maximized.getArea() < freeRectangle.getArea()))) {
+                    this.currentBin = bin;
                     maximized = freeRectangle;
                 }
             }
@@ -90,16 +87,17 @@ public class Packing {
         if (!(index == bin.getFreeRectangles().size())) {
 
             Rectangle currentFreeRectangle = bin.getFreeRectangles().get(index);
+
             double leftOverArea = currentFreeRectangle.getArea() - rectangle.getArea();
 
-            if (!rectangle.sameAs(currentFreeRectangle)) {
+            //if (!rectangle.sameAs(currentFreeRectangle)) {
 
-                if (leftOverArea > maxLeftOverArea) {
+                if (currentFreeRectangle.compareTo(rectangle) <= 0 && leftOverArea > maxLeftOverArea) {
                     freeRectangle = this.findFreeRectangle(bin, rectangle, currentFreeRectangle, ++index, leftOverArea);
                 } else {
                     freeRectangle = this.findFreeRectangle(bin, rectangle, freeRectangle, ++index, maxLeftOverArea);
                 }
-            }
+            //}
         }
 
         // Return found freeRectangle.
@@ -126,7 +124,9 @@ public class Packing {
             // Get the first free rectangle of the new current bin.
             freeRectangle = this.currentBin.getFreeRectangles().get(0);
 
-            if(!this.bins.contains(this.currentBin)) this.bins.add(this.currentBin);
+            if(!this.bins.contains(this.currentBin)) {
+                this.bins.add(this.currentBin);
+            }
         }
 
         // Decides the orientation for the rectangle.

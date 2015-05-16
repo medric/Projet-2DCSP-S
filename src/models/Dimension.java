@@ -53,4 +53,35 @@ public class Dimension {
     public void setLY(double LY) {
         this.LY = LY;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == null) return false;
+        if (o == this) return true;
+        if (!(o instanceof Dimension))return false;
+
+        Dimension oDimension = (Dimension)o;
+
+        if(oDimension.getLX() == this.getLX() && oDimension.getLY() == this.getLY()) {
+            return true;
+        }
+
+        // Try reversing
+        oDimension.reverse();
+
+        if(oDimension.getLX() == this.getLX() && oDimension.getLY() == this.getLY()) {
+            return true;
+        }
+
+        this.reverse();
+
+        if(oDimension.getLX() == this.getLX() && oDimension.getLY() == this.getLY()) {
+            return true;
+        }
+
+        // reset current
+        this.reverse();
+
+        return false;
+    }
 }

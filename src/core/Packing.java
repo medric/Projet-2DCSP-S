@@ -16,8 +16,13 @@ import java.util.ArrayList;
  */
 public class Packing {
     private ArrayList<Rectangle> rectangles;
-    public ArrayList<Bin> bins;
+
+    private ArrayList<Bin> bins;
     private Bin currentBin;
+
+    public ArrayList<Bin> getBins() {
+        return bins;
+    }
 
     /**
      * @param rectangles
@@ -156,7 +161,7 @@ public class Packing {
     }
 
     /**
-     * Splits.
+     * Performs split.
      *
      * @param freeRectangle
      */

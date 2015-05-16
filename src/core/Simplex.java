@@ -1,58 +1,86 @@
 package core;
 
-import org.apache.commons.math3.optimization.GoalType;
-import org.apache.commons.math3.optimization.PointValuePair;
+import org.apache.commons.math3.exception.TooManyIterationsException;
+import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
-import sun.java2d.pipe.SpanShapeRenderer;
+import org.apache.commons.math3.optim.OptimizationData;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.regex.Pattern;
+import java.util.List;
 
 
 /**
  * Created by Medric on 10/05/2015.
  */
 public class Simplex {
-
     SimplexSolver solver;
     Collection<LinearConstraint> constraints;
-    Collection<Pattern> patterns;
+    Solution solution;
 
     LinearObjectiveFunction f;
+    PointValuePair pointValuePair;
 
-    public Simplex(Collection<Pattern> solution, Collection<Pattern> patterns) {
+    /**
+     * Constructor.
+     *
+     * @param solution
+     */
+    public Simplex(Solution solution) {
         this.solver = new SimplexSolver();
         this.constraints = new ArrayList<LinearConstraint>();
+        this.solution = solution;
+
+        // Init
+        this.setUpConstraints();
+        this.setUpFitness();
     }
 
-        // TODO; identifier les rectangles sur chaque pattern
-    public void setUpConstraints() {
-        Iterator it = this.patterns.iterator();
+    /**
+     * Sets up the constraints for a given solution.
+     */
+    private void setUpConstraints() {
+        List<int[]> solutionVectors =  this.solution.getSolutionVectors();
+        int size = solutionVectors.size();
 
-        while(it.hasNext()) {
-           // this.constraints.add()
+        for(int i = 0; i < this.solution.getApplication().size(); i++) {
+            double[] coefficients = new double[size];
+
+            for (int j = 0; j < size; j++) {
+                double value = solutionVectors.get(j)[i];
+
+                coefficients[j] = value;
+            }
+
+            this.constraints.add(new LinearConstraint(coefficients,
+                    Relationship.GEQ, this.solution.getApplication().get(i).getQuantity()));
         }
     }
 
-    public void solve() {
-        org.apache.commons.math3.optim.PointValuePair solution = this.solver.optimize();
+    /**
+     *  Sets up the function to minimize for the given solution.
+     */
+    private void setUpFitness() {
+        double cost = this.solution.getPatternUnitCost();
+        int nbOfPatterns = this.solution.getPatterns().size();
+
+        double constantTerm = (nbOfPatterns * cost);
+
+        // x1 ... xn define the number of patterns to print
+        double[] coefficients = new double[nbOfPatterns];
+        for(int i = 0; i < nbOfPatterns; i++) {
+            coefficients[i] = 1;
+        }
+
+        this.f = new LinearObjectiveFunction(coefficients, constantTerm);
     }
 
-    /*Collection<LinearConstraint> constraints = new ArrayList<>();
-    constraints.add(new LinearConstraint(new double[] { -1, 2}, Relationship.LEQ,  5));
-    constraints.add(new LinearConstraint(new double[] { 1, 2}, Relationship.LEQ,  14));
-    constraints.add(new LinearConstraint(new double[] { 1}, Relationship.LEQ,  8));
-
-    PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-
-    double x = solution.getPoint()[0];
-    double y = solution.getPoint()[1];
-
-    double max = solution.getValue();
-
-    System.out.println("x : "+ x);
-    System.out.println("y : "+ y);
-    System.out.println("max : "+ max);*/
+    /**
+     *  Stores data and performs the optimization. The solution is stored in this.pointValuePair attribute.
+     */
+    public void solve() throws TooManyIterationsException, UnboundedSolutionException, NoFeasibleSolutionException {
+        // Optimize given the current linear objective function and previously set constraints
+        this.pointValuePair = this.solver.optimize(f, new LinearConstraintSet(this.constraints));
+    }
 }

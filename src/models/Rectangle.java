@@ -8,7 +8,7 @@ import javafx.geometry.Pos;
 public class Rectangle implements Comparable<Rectangle> {
     protected Position position;
     protected Dimension dimension;
-    protected Integer amount;
+    protected Integer quantity;
 
     /**
      * Default constructor.
@@ -40,9 +40,9 @@ public class Rectangle implements Comparable<Rectangle> {
      *
      * @param dimension
      */
-    public Rectangle(Dimension dimension, int amount) {
+    public Rectangle(Dimension dimension, int quantity) {
         this.setDimension(dimension);
-        this.setAmount(amount);
+        this.setQuantity(quantity);
     }
 
     /**
@@ -105,15 +105,15 @@ public class Rectangle implements Comparable<Rectangle> {
     /**
      * @return
      */
-    public Integer getAmount() {
-        return amount;
+    public Integer getQuantity() {
+        return quantity;
     }
 
     /**
-     * @param amount
+     * @param quantity
      */
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     @Override

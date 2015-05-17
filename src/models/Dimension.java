@@ -73,14 +73,8 @@ public class Dimension {
             return true;
         }
 
-        this.reverse();
-
-        if(oDimension.getLX() == this.getLX() && oDimension.getLY() == this.getLY()) {
-            return true;
-        }
-
-        // reset current
-        this.reverse();
+        // Reset
+        oDimension.reverse();
 
         return false;
     }

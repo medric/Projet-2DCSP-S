@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class Packing {
     private ArrayList<Rectangle> rectangles;
-    public ArrayList<Bin> bins;
+    public Solution solution;
     private Bin currentBin;
 
     /**
@@ -36,38 +36,40 @@ public class Packing {
      */
     private void initBins(Bin bin) {
         // Initializes the list of bins and add the given bin to it.
-        this.bins = new ArrayList<Bin>();
+        this.solution = new Solution();
 
         // Init current Bin.
         this.currentBin = bin;
 
-        this.bins.add(this.currentBin);
+        this.solution.getBins().add(this.currentBin);
     }
 
     /**
      *
      */
-    public void pack() {
+    public Solution pack() {
         Rectangle maximized;
-        Rectangle freeRectangle;
+            Rectangle freeRectangle;
 
-        // Iterates the collection of rectangles to be packed.
-        for (Rectangle rectangle : this.rectangles) {
-            maximized = null;
+            // Iterates the collection of rectangles to be packed.
+            for (Rectangle rectangle : this.rectangles) {
+                maximized = null;
 
-            // For each opened bin.
-            for (Bin bin : this.bins) {
-                freeRectangle = this.findFreeRectangle(bin, rectangle, null, 0, 0);
+                // For each opened bin.
+                for (Bin bin : this.solution.getBins()) {
+                    freeRectangle = this.findFreeRectangle(bin, rectangle, null, 0, 0);
 
-                if (maximized == null || (freeRectangle != null && (maximized.getArea() < freeRectangle.getArea()))) {
-                    this.currentBin = bin;
-                    maximized = freeRectangle;
+                    if (maximized == null || (freeRectangle != null && (maximized.getArea() < freeRectangle.getArea()))) {
+                        this.currentBin = bin;
+                        maximized = freeRectangle;
+                    }
                 }
-            }
 
-            // Then, update free Rectangles onto a current bin (split involved).
-            this.update(rectangle, maximized);
+                // Then, update free Rectangles onto a current bin (split involved).
+                this.update(rectangle, maximized);
         }
+
+        return this.solution;
     }
 
     /**
@@ -124,8 +126,8 @@ public class Packing {
             // Get the first free rectangle of the new current bin.
             freeRectangle = this.currentBin.getFreeRectangles().get(0);
 
-            if(!this.bins.contains(this.currentBin)) {
-                this.bins.add(this.currentBin);
+            if(!this.solution.getBins().contains(this.currentBin)) {
+                this.solution.getBins().add(this.currentBin);
             }
         }
 

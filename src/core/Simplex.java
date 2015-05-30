@@ -1,6 +1,6 @@
 package core;
 
-import org.apache.commons.math3.optimization.GoalType;
+/*import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
 import sun.java2d.pipe.SpanShapeRenderer;
@@ -8,7 +8,7 @@ import sun.java2d.pipe.SpanShapeRenderer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.regex.Pattern;
+import java.util.regex.Pattern;*/
 
 
 /**
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  */
 public class Simplex {
 
-    SimplexSolver solver;
+    /*SimplexSolver solver;
     Collection<LinearConstraint> constraints;
     Collection<Pattern> patterns;
 

@@ -1,4 +1,6 @@
+import core.Optimization;
 import models.Rectangle;
+import models.Solution;
 import utils.DataModel;
 
 import java.io.File;
@@ -18,7 +20,10 @@ public class Main {
 
             Packing packing = new Packing(dm.getRectangles(), dm.getBin()); // Pack
 
-            packing.pack();
+            Solution solution = packing.pack();
+
+            Optimization opti = new Optimization(50,6,solution);
+            opti.optimize();
             
         } catch (IOException e) {
             e.printStackTrace();

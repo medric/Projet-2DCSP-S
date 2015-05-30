@@ -1,5 +1,4 @@
 import core.Optimization;
-import models.Rectangle;
 import models.Solution;
 import utils.DataModel;
 
@@ -22,9 +21,8 @@ public class Main {
 
             Solution solution = packing.pack();
 
-            Optimization opti = new Optimization(50,6,solution);
+            Optimization opti = new Optimization(50, 6, solution);
             opti.optimize();
-            
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -68,6 +68,7 @@ public class Optimization
         Random random = new Random();
         CustomHashMap<Integer, ArrayList<Integer>> combination = new CustomHashMap<Integer, ArrayList<Integer>>();
         Solution newSolution;
+        int size = 0;
 
         int numberOfBinInFirstSolution = firstIndividual.getBins().size();
         int firstBinChosen;
@@ -82,8 +83,6 @@ public class Optimization
             }
         }
 
-        int size;
-
         // Tant que la population n'est pas enti√®re
         for (int i = 1; i < this.population.getPopulationSize(); i++) {
             newSolution = null;
@@ -92,12 +91,10 @@ public class Optimization
                 // Tirer au sort une combinaison
                 firstBinChosen = random.nextInt(numberOfBinInFirstSolution - 1) + 1;
                 size = combination.get(firstBinChosen).size() - 1;
-                secondBinChosen = size == 0 ? 0 : random.nextInt(size);
+                secondBinChosen = size <= 0 ? 0 : random.nextInt(size);
 
                 //Appeler SwitchImage
                 newSolution = this.switchImage(firstIndividual.getBins().get(firstBinChosen), firstIndividual.getBins().get(secondBinChosen), firstBinChosen, secondBinChosen);
-
-                this.population.addIndividual(newSolution);
 
                 // L'enlever de combination
                 combination.get(combination.indexOf(firstBinChosen)).remove(combination.get(firstBinChosen).get(secondBinChosen));
@@ -107,6 +104,8 @@ public class Optimization
                     numberOfBinInFirstSolution = combination.size();
                 }
             }
+
+            this.population.addIndividual(newSolution);
         }
     }
 
@@ -150,11 +149,11 @@ public class Optimization
         firstImageToSwitch = firstBinChosen.getRectangles().get(indexOfImage);
 
         // Prend la premi√®re image qui peut correspondre
-        indexOfSecondImageToSwitch = this.getIndexSecondImage(firstImageToSwitch, secondBinChosen);
+        indexOfSecondImageToSwitch = this.getIndexSecondImage(firstImageToSwitch, firstBinChosen, secondBinChosen);
 
         //switch dans les patterns
         if (indexOfSecondImageToSwitch != 0) {
-            this.performSwitch(indexOfImage, indexOfSecondImageToSwitch, firstBinIndex, secondBinIndex);
+            newSolution = this.performSwitch(indexOfImage, indexOfSecondImageToSwitch, firstBinIndex, secondBinIndex);
         }
 
         return newSolution;
@@ -166,80 +165,74 @@ public class Optimization
      * @param secondBinChosen
      * @return
      */
-    private int getIndexSecondImage(Rectangle firstImage, Bin secondBinChosen) {
+    private int getIndexSecondImage(Rectangle firstImage, Bin firstBinChosen, Bin secondBinChosen) {
+        Rectangle secondImage = null;
+        Bin copySecondBinChoosen = new Bin(secondBinChosen);
+        copySecondBinChoosen.setRectangles((ArrayList<Rectangle>) secondBinChosen.getRectangles());
+        Bin copyFirstBinChoosen = null;
         Random random = new Random();
         boolean isSecondImageChosen = false;
-        int numberOfImageInSecondBin = secondBinChosen.getRectangles().size();
+        int numberOfImageInSecondBin = copySecondBinChoosen.getRectangles().size();
         int chosenIndex = 0;
-        int iterationNumber = 0;
-
-        Dimension imagePlusFreeAreaDimension;
+        int iterationNumber = 1;
 
         while (!isSecondImageChosen && iterationNumber < 500) {
+            copySecondBinChoosen.setRectangles((ArrayList<Rectangle>) secondBinChosen.getRectangles());
             iterationNumber++;
             chosenIndex = random.nextInt(numberOfImageInSecondBin);
 
-            imagePlusFreeAreaDimension = this.getImagePlusFreeAreaDimension(secondBinChosen.getRectangles().get(chosenIndex), chosenIndex);
+            secondImage = copySecondBinChoosen.getRectangles().get(chosenIndex);
 
-            if (firstImage.getDimension().getLY() <= imagePlusFreeAreaDimension.getLY()
-                    && firstImage.getDimension().getLX() <= imagePlusFreeAreaDimension.getLX()) {
-                imagePlusFreeAreaDimension = this.getImagePlusFreeAreaDimension(firstImage, chosenIndex);
-                if (firstImage.getDimension().getLY() <= imagePlusFreeAreaDimension.getLY()
-                        && firstImage.getDimension().getLX() <= imagePlusFreeAreaDimension.getLX()) {
-                    isSecondImageChosen = true;
+            if(secondImage.compareTo(firstImage) > 0) {
+                secondImage.setDimension(firstImage.getDimension());
+
+                if (secondImage.getPosition().getX() + secondImage.getDimension().getLX() <= copySecondBinChoosen.getDimension().getLX()
+                        && secondImage.getPosition().getY() + secondImage.getDimension().getLY() <= copySecondBinChoosen.getDimension().getLY()) {
+                    isSecondImageChosen = this.canFirstImageReplacedSecondImage(copySecondBinChoosen, secondImage);
                 }
+            } else {
+                isSecondImageChosen = true;
+            }
+
+            if(isSecondImageChosen) {
+                //VÈrifier si la deuxiËme image rentre bien dans la premiËre
+            }
+
+            if(!isSecondImageChosen && iterationNumber == 500) {
+                chosenIndex = 0;
             }
         }
 
         return chosenIndex;
     }
 
-    /**
-     *
-     * @param chosenRectangle
-     * @param indexOfSecondChosenBin
-     * @return
-     */
-    private Dimension getImagePlusFreeAreaDimension(Rectangle chosenRectangle, int indexOfSecondChosenBin) {
-        Rectangle freeRectangle;
-        ArrayList<Rectangle> freeRectanglesX = new ArrayList<Rectangle>();
-        ArrayList<Rectangle> freeRectanglesY = new ArrayList<Rectangle>();
-        Bin pattern = this.population.getIndividuals().get(0).getBins().get(indexOfSecondChosenBin);
-        Iterator<Rectangle> iterator = pattern.getFreeRectangles().iterator();
-        Dimension imagePlusFreeAreaDimension = new Dimension(0, 0);
+    private boolean canFirstImageReplacedSecondImage(Bin copyOfSecondBin,  Rectangle secondImageChoosen) {
+        boolean canFirstImageReplacedSecondImage = true;
 
-        while (iterator.hasNext()) {
-            freeRectangle = iterator.next();
+        List<Rectangle> rectangles = copyOfSecondBin.getRectangles();
 
-            if (freeRectangle.getPosition().getY() == chosenRectangle.getPosition().getY()) {
-                if ((freeRectangle.getDimension().getLX() + freeRectangle.getPosition().getX() == chosenRectangle.getPosition().getX()
-                        || chosenRectangle.getDimension().getLX() + chosenRectangle.getPosition().getX() == freeRectangle.getPosition().getX())
-                        && (freeRectangle.getDimension().getLY() >= chosenRectangle.getDimension().getLY())) {
-                    freeRectanglesX.add(freeRectangle);
-                } else if ((freeRectangle.getDimension().getLY() + freeRectangle.getPosition().getY() == chosenRectangle.getPosition().getY()
-                        || chosenRectangle.getDimension().getLY() + chosenRectangle.getPosition().getY() == freeRectangle.getPosition().getY())
-                        && (freeRectangle.getDimension().getLX() >= chosenRectangle.getDimension().getLX())) {
-                    freeRectanglesY.add(freeRectangle);
+        for(Rectangle rectangle : rectangles) {
+            if(secondImageChoosen.getPosition().getX() < rectangle.getPosition().getX() + rectangle.getDimension().getLX()
+                    || secondImageChoosen.getPosition().getX() + secondImageChoosen.getDimension().getLX() > rectangle.getPosition().getX()) {
+                if(rectangle.getPosition().getY() < secondImageChoosen.getPosition().getY()) {
+                    if(secondImageChoosen.getPosition().getY() < rectangle.getPosition().getY() + rectangle.getDimension().getLY()
+                            || secondImageChoosen.getPosition().getY() + secondImageChoosen.getDimension().getLY() < rectangle.getPosition().getY() + rectangle.getDimension().getLY()) {
+                        canFirstImageReplacedSecondImage = false;
+                    }
+                } else {
+                    canFirstImageReplacedSecondImage = false;
                 }
             }
         }
 
-        for (Rectangle rectangle : freeRectanglesX) {
-            imagePlusFreeAreaDimension.setLX(imagePlusFreeAreaDimension.getLX() + rectangle.getDimension().getLX());
-        }
-
-        for (Rectangle rectangle : freeRectanglesY) {
-            imagePlusFreeAreaDimension.setLY(imagePlusFreeAreaDimension.getLY() + rectangle.getDimension().getLY());
-        }
-
-        return imagePlusFreeAreaDimension;
+        return canFirstImageReplacedSecondImage;
     }
 
     /**
      *
      * @param indexImageFirstBin
      * @param indexImageSecondBin
-     * @param firstBinIndex
+     * @    param firstBinIndex
      * @param secondBinIndex
      * @return
      */
@@ -248,10 +241,10 @@ public class Optimization
         Rectangle imageFirstBin = solution.getBins().get(firstBinIndex).getRectangles().get(indexImageFirstBin);
         Rectangle imageSecondBin = solution.getBins().get(secondBinIndex).getRectangles().get(indexImageSecondBin);
         Position secondImagePosition;
-        Dimension dimensionFirstRectangle = this.getImagePlusFreeAreaDimension(imageFirstBin, firstBinIndex);
+        /*Dimension dimensionFirstRectangle = this.getImagePlusFreeAreaDimension(imageFirstBin, firstBinIndex);
         Dimension dimensionSecondRectangle = this.getImagePlusFreeAreaDimension(imageSecondBin, secondBinIndex);
         imageFirstBin.setDimension(dimensionSecondRectangle);
-        imageSecondBin.setDimension(dimensionFirstRectangle);
+        imageSecondBin.setDimension(dimensionFirstRectangle);*/
         secondImagePosition = imageSecondBin.getPosition();
         imageSecondBin.setPosition(imageFirstBin.getPosition());
         imageFirstBin.setPosition(secondImagePosition);

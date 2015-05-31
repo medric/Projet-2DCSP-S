@@ -1,9 +1,5 @@
 package models;
 
-import com.sun.deploy.net.proxy.RemoveCommentReader;
-import org.apache.commons.math3.linear.RealVector;
-import org.w3c.dom.css.Rect;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,6 +140,22 @@ public class Bin {
      */
     public List<Rectangle> getRectangles() {
         return rectangles;
+    }
+
+    /**
+     * @param rectangles new list of rectangle
+     */
+    public void setRectangles(ArrayList<Rectangle> rectangles) {
+        Rectangle newRectangle = null;
+        this.rectangles = new ArrayList();
+
+        for(Rectangle rectangle : rectangles) {
+            newRectangle = new Rectangle();
+            newRectangle.setDimension(new Dimension(rectangle.getDimension()));
+            newRectangle.setPosition(new Position(rectangle.getPosition()));
+
+            this.rectangles.add(newRectangle);
+        }
     }
 
     /**

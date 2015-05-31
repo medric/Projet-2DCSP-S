@@ -17,6 +17,10 @@ public class Dimension {
         this.setLY(LY);
     }
 
+    public Dimension(Dimension newDimension) {
+        this(newDimension.getLX(), newDimension.getLY());
+    }
+
     /**
      * Reverses LX / LY.
      */

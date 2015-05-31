@@ -21,6 +21,7 @@ public class Main {
             Packing packing = new Packing(dm.getRectangles(), dm.getBin()); // Pack
 
             Solution solution = packing.pack();
+            solution.setApplication(dm.getRectangles());
 
             // First, resolve simplex for the initial solution
             Simplex simplex = new Simplex(solution);

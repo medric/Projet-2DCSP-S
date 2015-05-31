@@ -16,6 +16,10 @@ public class Position {
         this.setY(y);
     }
 
+    public Position(Position newPosition) {
+        this(newPosition.getX(), newPosition.getY());
+    }
+
     /**
      * @return x
      */

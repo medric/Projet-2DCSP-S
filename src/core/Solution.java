@@ -97,7 +97,7 @@ public class Solution {
 
                 index++;
             }
-
+    
             solutionVectors.add(vector);
         }
 

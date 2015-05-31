@@ -22,7 +22,7 @@ public class Simplex {
     LinearObjectiveFunction f;
     PointValuePair pointValuePair;
 
-    /**
+    /**a
      * Constructor.
      *
      * @param solution

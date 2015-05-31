@@ -97,23 +97,16 @@ public class Packing {
 
             //if (!rectangle.sameAs(currentFreeRectangle)) {
 
-                if (currentFreeRectangle.compareTo(rectangle) <= 0 && leftOverArea > maxLeftOverArea) {
-                    freeRectangle = this.findFreeRectangle(bin, rectangle, currentFreeRectangle, ++index, leftOverArea);
-                } else {
-                    freeRectangle = this.findFreeRectangle(bin, rectangle, freeRectangle, ++index, maxLeftOverArea);
-                }
+            if (currentFreeRectangle.compareTo(rectangle) <= 0 && leftOverArea > maxLeftOverArea) {
+                freeRectangle = this.findFreeRectangle(bin, rectangle, currentFreeRectangle, ++index, leftOverArea);
+            } else {
+                freeRectangle = this.findFreeRectangle(bin, rectangle, freeRectangle, ++index, maxLeftOverArea);
+            }
             //}
         }
 
         // Return found freeRectangle.
         return freeRectangle;
-    }
-
-    /**
-     *
-     */
-    private void merge() {
-
     }
 
     /**

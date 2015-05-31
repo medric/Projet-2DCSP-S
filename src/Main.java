@@ -14,7 +14,7 @@ import core.Packing;
  */
 public class Main {
     public static void main(String[] args) {
-        File file = new File("./data/data_50Valpha.txt");
+        File file = new File("./data/data_20Salpha.txt");
 
         try {
             DataModel dm = new DataModel(file);
@@ -28,6 +28,8 @@ public class Main {
             Simplex simplex = new Simplex(init);
 
             simplex.solve();
+
+            System.out.print("foo");
         } catch (Exception e) {
            // TODO identify exceptions
             e.printStackTrace();

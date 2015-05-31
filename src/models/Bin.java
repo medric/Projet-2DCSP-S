@@ -1,5 +1,7 @@
 package models;
 
+import com.sun.deploy.net.proxy.RemoveCommentReader;
+import org.apache.commons.math3.linear.RealVector;
 import org.w3c.dom.css.Rect;
 
 import java.util.ArrayList;
@@ -145,7 +147,7 @@ public class Bin {
     }
 
     /**
-     * Add free rectangle to the current bin.
+     * Adds free rectangle to the current bin.
      *
      * @param rectangle
      */
@@ -154,7 +156,7 @@ public class Bin {
     }
 
     /**
-     * Remove free rectangle from the current bin.
+     * Removes free rectangle from the current bin.
      *
      * @param rectangle
      */
@@ -162,8 +164,31 @@ public class Bin {
         this.freeRectangles.remove(rectangle);
     }
 
-
+    /**
+     * Adds a rectangle to the list of rectangles packed in this bin.
+     *
+     * @param rectangle
+     */
     public void addRectangle(Rectangle rectangle) {
         this.rectangles.add(rectangle);
+    }
+
+    /**
+     * Gets the number of times a rectangle is found in the current bin.
+     *
+     * @param _rectangle
+     * @return
+     */
+    public int getRectangleRepetition(Rectangle _rectangle) {
+        int repetition = 0;
+
+        for(Rectangle rectangle : this.rectangles) {
+            // The comparison is based on the dimension
+            if(rectangle.getDimension().equals(_rectangle.getDimension())) {
+                repetition++;
+            }
+        }
+
+        return repetition;
     }
 }

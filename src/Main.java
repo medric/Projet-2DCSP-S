@@ -1,9 +1,13 @@
 import core.Optimization;
 import models.Solution;
+import core.Simplex;
+import core.Solution;
+import models.Rectangle;
 import utils.DataModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import core.Packing;
 
@@ -12,7 +16,7 @@ import core.Packing;
  */
 public class Main {
     public static void main(String[] args) {
-        File file = new File("./data/data_20Lalpha.txt");
+        File file = new File("./data/data_20Salpha.txt");
 
         try {
             DataModel dm = new DataModel(file);
@@ -22,8 +26,21 @@ public class Main {
             Solution solution = packing.pack();
 
             Optimization opti = new Optimization(50, 6, solution);
+
             opti.optimize();
         } catch (IOException e) {
+
+            packing.pack();
+
+            Solution init = new Solution(packing.getBins(), dm.getRectangles());
+
+            Simplex simplex = new Simplex(init);
+
+            simplex.solve();
+
+            System.out.print("foo");
+        } catch (Exception e) {
+           // TODO identify exceptions
             e.printStackTrace();
         }
     }

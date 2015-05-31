@@ -1,6 +1,6 @@
 package models;
 
-import core.Packing;
+import core.Solution;
 
 import java.util.ArrayList;
 

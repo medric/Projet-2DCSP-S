@@ -1,15 +1,11 @@
 package core;
 
-import org.apache.commons.math3.optimization.GoalType;
-import org.apache.commons.math3.optimization.PointValuePair;
+import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.linear.*;
-import org.apache.commons.math3.optim.OptimizationData;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.regex.Pattern;
 
 
 /**
@@ -19,6 +15,7 @@ public class Simplex {
     SimplexSolver solver;
     Collection<LinearConstraint> constraints;
     Solution solution;
+    private PointValuePair pointValuePair;
 
     LinearObjectiveFunction f;
 
@@ -41,7 +38,7 @@ public class Simplex {
      * Sets up the constraints for a given solution.
      */
     private void setUpConstraints() {
-        List<int[]> solutionVectors =  this.solution.getSolutionVectors();
+        ArrayList<int[]> solutionVectors =  this.solution.getSolutionVectors();
         int size = solutionVectors.size();
 
         for(int i = 0; i < this.solution.getApplication().size(); i++) {
@@ -63,7 +60,7 @@ public class Simplex {
      */
     private void setUpFitness() {
         double cost = this.solution.getPatternUnitCost();
-        int nbOfPatterns = this.solution.getPatterns().size();
+        int nbOfPatterns = this.solution.getBins().size();
 
         double constantTerm = (nbOfPatterns * cost);
 
@@ -81,6 +78,14 @@ public class Simplex {
      */
     public void solve() throws TooManyIterationsException, UnboundedSolutionException, NoFeasibleSolutionException {
         // Optimize given the current linear objective function and previously set constraints
-        this.pointValuePair = this.solver.optimize(f, new LinearConstraintSet(this.constraints));
+        this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints)));
+    }
+
+    public PointValuePair getPointValuePair() {
+        return pointValuePair;
+    }
+
+    public void setPointValuePair(PointValuePair pointValuePair) {
+        this.pointValuePair = pointValuePair;
     }
 }

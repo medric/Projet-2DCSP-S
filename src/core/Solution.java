@@ -11,21 +11,36 @@ import java.util.List;
  */
 public class Solution {
     private List<Rectangle> application;
-    private List<Bin> patterns;
+    private ArrayList<Bin> bins;
     private double patternUnitCost;
 
     /**
-     * Constructor.
+     *  Constructor.
+     */
+    public Solution() {
+        this.bins = new ArrayList<Bin>();
+    }
+
+    /**
+     * Overwriting
      *
-     * @param patterns
+     * @param bins
      * @param application
      */
-    public Solution(List<Bin> patterns, List<Rectangle> application) {
-        this.setPatterns(patterns);
+    public Solution(ArrayList<Bin> bins, List<Rectangle> application) {
+        this.setBins(bins);
         this.setApplication(application);
 
         // Get the first pattern to get the cost
-        this.setPatternUnitCost(this.patterns.get(0).getCost());
+        this.setPatternUnitCost(this.bins.get(0).getCost());
+    }
+
+    /**
+     * Overwriting
+     * @param solution
+     */
+    public Solution(Solution solution) {
+        this.bins = (ArrayList<Bin>)solution.bins.clone();
     }
 
     /**
@@ -33,17 +48,17 @@ public class Solution {
      *
      * @return
      */
-    public List<Bin> getPatterns() {
-        return patterns;
+    public ArrayList<Bin> getBins() {
+        return bins;
     }
 
     /**
      * Set the list of patterns for the current solution.
      *
-     * @param patterns
+     * @param bins
      */
-    public void setPatterns(List<Bin> patterns) {
-        this.patterns = patterns;
+    public void setBins(ArrayList<Bin> bins) {
+        this.bins = (ArrayList<Bin>)bins.clone();
     }
 
     /**
@@ -84,11 +99,11 @@ public class Solution {
      * Skim each pattern to see where each rectangle is packed.
      * @return
      */
-    public List<int[]> getSolutionVectors() {
-        List<int[]> solutionVectors = new ArrayList<int[]>();
+    public ArrayList<int[]> getSolutionVectors() {
+        ArrayList<int[]> solutionVectors = new ArrayList<int[]>();
         int index;
 
-        for(Bin pattern : this.patterns) {
+        for(Bin pattern : this.bins) {
             index = 0;
             int[] vector = new int[this.application.size()];
 

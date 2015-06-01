@@ -143,6 +143,22 @@ public class Bin {
     }
 
     /**
+     * @param rectangles new list of rectangle
+     */
+    public void setRectangles(ArrayList<Rectangle> rectangles) {
+        Rectangle newRectangle = null;
+        this.rectangles = new ArrayList();
+
+        for(Rectangle rectangle : rectangles) {
+            newRectangle = new Rectangle();
+            newRectangle.setDimension(new Dimension(rectangle.getDimension()));
+            newRectangle.setPosition(new Position(rectangle.getPosition()));
+
+            this.rectangles.add(newRectangle);
+        }
+    }
+
+    /**
      * Adds free rectangle to the current bin.
      *
      * @param rectangle
@@ -186,5 +202,23 @@ public class Bin {
         }
 
         return repetition;
+    }
+
+    public boolean equals(Bin binToCompare) {
+        boolean result = false;
+
+        List<Rectangle> rectangles = binToCompare.getRectangles();
+        Dimension rectangleDimension = null;
+        Position rectanglePosition = null;
+
+        for (int i = 0; i < rectangles.size(); i++) {
+            rectangleDimension = rectangles.get(i).getDimension();
+            rectanglePosition = rectangles.get(i).getPosition();
+
+            if(rectangleDimension.equals(this.getRectangles().get(i).getDimension()) && rectanglePosition.equals(this.getRectangles().get(i).getPosition())) {
+                result = true;
+            }
+        }
+        return result;
     }
 }

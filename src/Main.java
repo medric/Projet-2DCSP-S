@@ -4,7 +4,6 @@ import core.Solution;
 import utils.DataModel;
 
 import java.io.File;
-import java.io.IOException;
 
 import core.Packing;
 
@@ -13,14 +12,16 @@ import core.Packing;
  */
 public class Main {
     public static void main(String[] args) {
-        File file = new File("./data/data_20Salpha.txt");
 
         try {
+            File file = new File("./data/data_20Salpha.txt");
+
             DataModel dm = new DataModel(file);
 
             Packing packing = new Packing(dm.getRectangles(), dm.getBin()); // Pack
 
             Solution solution = packing.pack();
+            solution.setApplication(dm.getRectangles());
 
             // First, resolve simplex for the initial solution
             Simplex simplex = new Simplex(solution);

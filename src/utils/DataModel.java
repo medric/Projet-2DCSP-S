@@ -91,6 +91,8 @@ public class DataModel {
      */
     private void fetchRectangles() throws IOException {
         String sCurrentLine;
+        Rectangle newRectangle = null;
+        Integer id = 0;
 
         while ((sCurrentLine = this.br.readLine()) != null) {
             RECTANGLE_MATCHER.reset(sCurrentLine); //reset the input
@@ -102,7 +104,10 @@ public class DataModel {
             Dimension dimension = new Dimension(Double.parseDouble(RECTANGLE_MATCHER.group(1)), Double.parseDouble(RECTANGLE_MATCHER.group(2)));
             Integer amount = Integer.parseInt(RECTANGLE_MATCHER.group(3));
 
-            this.rectangles.add(new Rectangle(dimension, amount));
+            id++;
+            newRectangle = new Rectangle(dimension, amount);
+            newRectangle.setId(id);
+            this.rectangles.add(newRectangle);
         }
     }
 

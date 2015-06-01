@@ -24,7 +24,7 @@ public class Simplex {
      *
      * @param solution
      */
-    public Simplex(Solution solution) {
+    public Simplex(Solution solution) throws Exception {
         this.solver = new SimplexSolver();
         this.constraints = new ArrayList<LinearConstraint>();
         this.solution = solution;
@@ -37,7 +37,7 @@ public class Simplex {
     /**
      * Sets up the constraints for a given solution.
      */
-    private void setUpConstraints() {
+    private void setUpConstraints() throws Exception {
         ArrayList<int[]> solutionVectors =  this.solution.getSolutionVectors();
         int size = solutionVectors.size();
 
@@ -58,7 +58,7 @@ public class Simplex {
     /**
      *  Sets up the function to minimize for the given solution.
      */
-    private void setUpFitness() {
+    private void setUpFitness() throws Exception {
         double cost = this.solution.getPatternUnitCost();
         int nbOfPatterns = this.solution.getBins().size();
 

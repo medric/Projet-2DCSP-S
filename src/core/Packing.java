@@ -29,18 +29,26 @@ public class Packing
      * @param rectangles
      * @param bin
      */
-    public Packing(ArrayList<Rectangle> rectangles, Bin bin) {
+    public Packing(ArrayList<Rectangle> rectangles, Bin bin) throws Exception {
         // Initializes the sequence of rectangles.
         this.setRectangles(rectangles);
 
         this.initBins(bin);
     }
 
+    public Packing() {
+
+    }
+
+    public ArrayList<Rectangle> getRectangles() {
+        return  this.rectangles;
+    }
+
 
     /**
      * @param bin
      */
-    private void initBins(Bin bin) {
+    private void initBins(Bin bin) throws Exception {
         // Initializes the list of bins through solution model
         this.solution = new Solution();
 
@@ -56,7 +64,7 @@ public class Packing
      *
      * @return the current Solution object.
      */
-    public Solution pack() {
+    public Solution pack() throws Exception {
         Rectangle maximized;
         Rectangle freeRectangle;
 
@@ -92,7 +100,7 @@ public class Packing
      * @param maxLeftOverArea
      * @return
      */
-    private Rectangle findFreeRectangle(Bin bin, Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) {
+    public Rectangle findFreeRectangle(Bin bin, Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) throws Exception {
 
         // End of collections reached.
         if (!(index == bin.getFreeRectangles().size())) {
@@ -119,7 +127,7 @@ public class Packing
      * @param rectangle
      * @param freeRectangle
      */
-    private void update(Rectangle rectangle, Rectangle freeRectangle) {
+    private void update(Rectangle rectangle, Rectangle freeRectangle) throws Exception {
         if (freeRectangle == null) {
 
             // Call copy constructor to get a new identical Bin.
@@ -148,7 +156,7 @@ public class Packing
      * @param rectangle
      * @param freeRectangle
      */
-    private void orientate(Rectangle rectangle, Rectangle freeRectangle) {
+    private void orientate(Rectangle rectangle, Rectangle freeRectangle) throws Exception {
         double deltaLX, deltaLY;
 
         deltaLX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
@@ -159,19 +167,24 @@ public class Packing
         }
     }
 
-    /**
-     * Performs split.
-     *
-     * @param freeRectangle
-     */
-    private void split(Rectangle rectangle, Rectangle freeRectangle) {
+    public void split(Bin bin, Rectangle rectangle, Rectangle freeRectangle) throws Exception {
         double deltaLX, deltaLY;
 
         deltaLX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
         deltaLY = freeRectangle.getDimension().getLY() - rectangle.getDimension().getLY();
 
         // Shorter Leftover Axis Split Rule (-SLAS).
-        this.currentBin.splitFreeRectangle(rectangle, freeRectangle, deltaLX < deltaLY ? Direction.HORIZONTAL : Direction.VERTICAL);
+        bin.splitFreeRectangle(rectangle, freeRectangle, deltaLX < deltaLY ? Direction.HORIZONTAL : Direction.VERTICAL);
+    }
+
+
+    /**
+     * Performs split.
+     *
+     * @param freeRectangle
+     */
+    private void split(Rectangle rectangle, Rectangle freeRectangle) throws Exception {
+        this.split(this.currentBin, rectangle, freeRectangle);
     }
 
     /**

@@ -1,5 +1,4 @@
 import core.Optimization;
-import core.Simplex;
 import core.Solution;
 import utils.DataModel;
 

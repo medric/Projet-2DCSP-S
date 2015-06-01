@@ -14,16 +14,21 @@ import java.util.*;
  */
 public class Optimization
 {
+    // GLOBAL PARAMETERS (INIT)
     private static final int GENESIS_REPETITIONS = 50;
     private static final int MUTATION_INC = 1;
     private static final int MUTATION_MAX = 10;
     private static final int MUTATION_INIT_VALUE = 2;
     private static final int CROSSOVER_NUMBER = 2;
+    private static final int CROSSOVER_INIT_VALUE = 2;
+    private static final int INIT_NB_IMAGES_SWITCHES = 2;
 
     private Population population;
     private int generationNumber;
     private int mutationProbabilityIndex;
+    private int switchImageProbabilty;
     private Random random;
+    private int numberOfImagesSwitches;
 
     /**
      * Constructor
@@ -39,6 +44,9 @@ public class Optimization
         this.random = new Random();
 
         this.mutationProbabilityIndex = MUTATION_INIT_VALUE; // Will give a 1/2 probability
+        this.switchImageProbabilty = CROSSOVER_INIT_VALUE;
+
+        this.numberOfImagesSwitches = INIT_NB_IMAGES_SWITCHES;
     }
 
     /**
@@ -282,35 +290,54 @@ public class Optimization
      */
     private void performCrossover(Solution firstIndividual, Solution secondIndividual) throws Exception {
         // Select 2 bins
-        Bin firstRandomBin = firstIndividual.getBins().get(random.nextInt(firstIndividual.getBins().size() - 1));
-        Bin secondRandomBin = firstIndividual.getBins().get(random.nextInt(firstIndividual.getBins().size() - 1));
-
-        // Ajouter un ou n switchImage
-        // Est-ce que toutes les images sont toujours présentes dans la solution après le siwtch des bins ?
+        Bin firstRandomBin = this.getRandomBin(firstIndividual);
+        Bin secondRandomBin = this.getRandomBin(firstIndividual);
 
         firstIndividual.replaceBin(firstRandomBin, secondRandomBin);
         secondIndividual.replaceBin(secondRandomBin, firstRandomBin);
+
+        if(!(allImagesArePresent(firstIndividual) && allImagesArePresent(secondIndividual))) {
+            // reverse
+            secondIndividual.replaceBin(secondRandomBin, firstRandomBin);
+            secondIndividual.replaceBin(firstRandomBin, secondRandomBin);
+        }
+
+        // Switch d'images
+        boolean imagesSwitch = random.nextInt(this.switchImageProbabilty)==0;
+
+        if(imagesSwitch) {
+            for(int i = 0; i < this.numberOfImagesSwitches; i++) {
+
+                Bin alpha = this.getRandomBin(firstIndividual);
+                Bin beta = this.getRandomBin(secondIndividual);
+
+                this.switchImage(alpha, beta, firstIndividual.getBins().indexOf(alpha), firstIndividual.getBins().indexOf(beta));
+            }
+        }
     }
 
-    /*private boolean allImagesArePresent(Solution solutionToCheck) {
-        boolean allImagesarePresent = true;
-        ArrayList<Vector2D> vectors = solutionToCheck.getSolutionVectors();
-        Vector2D vectorResult = null;
+    /**
+     *
+     * @param solutionToCheck
+     * @return
+     */
+    private boolean allImagesArePresent(Solution solutionToCheck) {
+        ArrayList<int[]> vectors = solutionToCheck.getSolutionVectors();
+        ArrayList<Integer> result = new ArrayList<Integer>();
 
         //Additionne tous les vecteurs
-        for(Vector2D vector : vectors) {
-            //Parcours tous les int du vecteur et on l'ajoute au vecteur resultat correspondant
-            if(vectorResult == null) {
-                vectorResult = new Vector2D(vector.toArray());
-            } else {
-                vectorResult.add(vector);
+        for(int index = 0; index < solutionToCheck.getApplication().size(); index++) {
+            int value = 0;
+
+            for(int[] vector : vectors) {
+                value += vector[index];
+
+                result.add(value);
             }
         }
 
-        //On parcours le vecteurs et on renvoi false si un 0 est présent
-
-        return allImagesarePresent;
-    }*/
+        return result.contains(0);
+    }
 
     /**
      * Mutate an individual of the current population
@@ -416,7 +443,7 @@ public class Optimization
             nextGeneration.addIndividual(this.getSelectedSolutionByRouletteWheel(chosenNumber, selection));
         }
 
-        return  nextGeneration;
+        return nextGeneration;
     }
 
     /**
@@ -441,5 +468,15 @@ public class Optimization
         }
 
         return chosenSolution;
+    }
+
+    /**
+     * Returns a random pattern from a given solution.
+     * @param solution
+     * @return
+     * @throws Exception
+     */
+    private Bin getRandomBin(Solution solution) throws Exception {
+        return solution.getBins().get(random.nextInt(solution.getBins().size() - 1));
     }
 }

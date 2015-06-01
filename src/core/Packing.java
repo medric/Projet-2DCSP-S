@@ -36,6 +36,14 @@ public class Packing
         this.initBins(bin);
     }
 
+    public Packing() {
+
+    }
+
+    public ArrayList<Rectangle> getRectangles() {
+        return  this.rectangles;
+    }
+
 
     /**
      * @param bin
@@ -92,7 +100,7 @@ public class Packing
      * @param maxLeftOverArea
      * @return
      */
-    private Rectangle findFreeRectangle(Bin bin, Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) {
+    public Rectangle findFreeRectangle(Bin bin, Rectangle rectangle, Rectangle freeRectangle, int index, double maxLeftOverArea) {
 
         // End of collections reached.
         if (!(index == bin.getFreeRectangles().size())) {
@@ -159,19 +167,24 @@ public class Packing
         }
     }
 
-    /**
-     * Performs split.
-     *
-     * @param freeRectangle
-     */
-    private void split(Rectangle rectangle, Rectangle freeRectangle) {
+    public void split(Bin bin, Rectangle rectangle, Rectangle freeRectangle) {
         double deltaLX, deltaLY;
 
         deltaLX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
         deltaLY = freeRectangle.getDimension().getLY() - rectangle.getDimension().getLY();
 
         // Shorter Leftover Axis Split Rule (-SLAS).
-        this.currentBin.splitFreeRectangle(rectangle, freeRectangle, deltaLX < deltaLY ? Direction.HORIZONTAL : Direction.VERTICAL);
+        bin.splitFreeRectangle(rectangle, freeRectangle, deltaLX < deltaLY ? Direction.HORIZONTAL : Direction.VERTICAL);
+    }
+
+
+    /**
+     * Performs split.
+     *
+     * @param freeRectangle
+     */
+    private void split(Rectangle rectangle, Rectangle freeRectangle) {
+        this.split(this.currentBin, rectangle, freeRectangle);
     }
 
     /**

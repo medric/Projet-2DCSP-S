@@ -13,12 +13,14 @@ public class Solution {
     private List<Rectangle> application;
     private ArrayList<Bin> bins;
     private double patternUnitCost;
+    private double fitness;
 
     /**
      *  Constructor.
      */
     public Solution() {
         this.bins = new ArrayList<Bin>();
+        this.fitness = 0;
     }
 
     /**
@@ -33,6 +35,7 @@ public class Solution {
 
         // Get the first pattern to get the cost
         this.setPatternUnitCost(this.bins.get(0).getCost());
+        this.fitness = 0;
     }
 
     /**
@@ -41,6 +44,10 @@ public class Solution {
      */
     public Solution(Solution solution) {
         this.bins = (ArrayList<Bin>)solution.bins.clone();
+    }
+
+    public double getFitness() {
+        return this.fitness;
     }
 
     /**
@@ -117,5 +124,18 @@ public class Solution {
         }
 
         return solutionVectors;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public void calculFitness() {
+        // First, resolve simplex for the initial solution
+        Simplex simplex = new Simplex(this);
+
+        simplex.solve();
+
+        this.fitness = simplex.getPointValuePair().getValue();
     }
 }

@@ -203,4 +203,22 @@ public class Bin {
 
         return repetition;
     }
+
+    public boolean equals(Bin binToCompare) {
+        boolean result = false;
+
+        List<Rectangle> rectangles = binToCompare.getRectangles();
+        Dimension rectangleDimension = null;
+        Position rectanglePosition = null;
+
+        for (int i = 0; i < rectangles.size(); i++) {
+            rectangleDimension = rectangles.get(i).getDimension();
+            rectanglePosition = rectangles.get(i).getPosition();
+
+            if(rectangleDimension.equals(this.getRectangles().get(i).getDimension()) && rectanglePosition.equals(this.getRectangles().get(i).getPosition())) {
+                result = true;
+            }
+        }
+        return result;
+    }
 }

@@ -9,6 +9,7 @@ public class Rectangle implements Comparable<Rectangle> {
     protected Position position;
     protected Dimension dimension;
     protected Integer quantity;
+    protected  Integer id;
 
     /**
      * Default constructor.
@@ -72,6 +73,14 @@ public class Rectangle implements Comparable<Rectangle> {
      */
     public boolean sameAs(Rectangle rectangle) {
         return this.getArea() == rectangle.getArea();
+    }
+
+    public Integer getId() {
+        return this.id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**

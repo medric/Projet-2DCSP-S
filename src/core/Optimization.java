@@ -1,6 +1,8 @@
 package core;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import models.*;
+import org.w3c.dom.css.Rect;
 
 import java.util.*;
 
@@ -9,6 +11,7 @@ import java.util.*;
  */
 public class Optimization
 {
+    private static final int GENESIS_REPTITION = 50;
     private Population population;
     private int generationNumber;
     private int mutationProbabilityIndex;
@@ -20,6 +23,7 @@ public class Optimization
      * @param firstIndividual
      */
     public Optimization(int generationNumber, int size, Solution firstIndividual) {
+        firstIndividual.calculFitness();
         this.population = new Population(size, firstIndividual);
         this.generationNumber = generationNumber;
 
@@ -47,7 +51,7 @@ public class Optimization
     /**
      *
      */
-    public void optimize() {
+    public Solution optimize() {
         // Genesis
         this.genesis();
 
@@ -57,14 +61,43 @@ public class Optimization
         }
 
         // Apocalypse
-        this.apocalypse();
+        return this.apocalypse();
     }
 
     /**
      *
      */
     private void genesis() {
-        Solution firstIndividual = this.population.getIndividuals().get(0);
+        int cpt = 0;
+        int chosenBinId = 0;
+        Solution newSolution = null;
+        Rectangle image;
+        Random random = new Random();
+        Packing packing = new Packing();
+        ArrayList<Rectangle> imagesToPlace;
+
+        for(int i = 0; i < this.population.getPopulationSize(); i++) {
+            image = this.population.getIndividuals().get(0).getApplication().get(random.nextInt(this.population.getIndividuals().get(0).getApplication().size() - 1));
+            while (cpt < GENESIS_REPTITION) {
+                chosenBinId = random.nextInt(this.population.getIndividuals().get(0).getBins().size() - 1);
+                newSolution = this.addImageToBin(this.population.getIndividuals().get(0), packing, chosenBinId, image);
+
+                cpt++;
+            }
+
+            if(newSolution == null) {
+                newSolution = new Solution(this.population.getIndividuals().get(0));
+                newSolution.getBins().add(new Bin(this.population.getIndividuals().get(0).getBins().get(0)));
+                imagesToPlace = (ArrayList<Rectangle>)((ArrayList<Rectangle>)this.population.getIndividuals().get(0).getApplication()).clone();
+                packing.setRectangles(imagesToPlace);
+                packing.getRectangles().add(image);
+                newSolution = packing.pack();
+            }
+
+            newSolution.setApplication(this.population.getIndividuals().get(0).getApplication());
+        }
+
+        /*Solution firstIndividual = this.population.getIndividuals().get(0);
         Random random = new Random();
         CustomHashMap<Integer, ArrayList<Integer>> combination = new CustomHashMap<Integer, ArrayList<Integer>>();
         Solution newSolution;
@@ -75,7 +108,7 @@ public class Optimization
         int secondBinChosen;
 
         // Faire toutes les combinaisons possibles
-        for (int i = 1; i <= numberOfBinInFirstSolution - 1; i++) {
+        for (int i = 1; i <= numberOfBinInFirstSolution; i++) {
             combination.put(i, new ArrayList<Integer>());
 
             for (int j = i + 1; j <= numberOfBinInFirstSolution; j++) {
@@ -84,47 +117,56 @@ public class Optimization
         }
 
         // Tant que la population n'est pas entiÃ¨re
-        for (int i = 1; i < this.population.getPopulationSize(); i++) {
+        for (int i = 1; i < this.population.getPopulationSize() - 1; i++) {
             newSolution = null;
 
             while (newSolution == null) {
                 // Tirer au sort une combinaison
                 firstBinChosen = random.nextInt(numberOfBinInFirstSolution - 1) + 1;
-                size = combination.get(firstBinChosen).size() - 1;
-                secondBinChosen = size <= 0 ? 0 : random.nextInt(size);
+                if (combination.containsKey(firstBinChosen)) {
+                    size = combination.get(firstBinChosen).size() - 1;
+                    secondBinChosen = size <= 0 ? 0 : random.nextInt(size);
 
-                //Appeler SwitchImage
-                newSolution = this.switchImage(firstIndividual.getBins().get(firstBinChosen), firstIndividual.getBins().get(secondBinChosen), firstBinChosen, secondBinChosen);
+                    //Appeler SwitchImage
+                    newSolution = this.switchImage(firstIndividual.getBins().get(firstBinChosen), firstIndividual.getBins().get(secondBinChosen), firstBinChosen, secondBinChosen);
 
-                // L'enlever de combination
-                combination.get(combination.indexOf(firstBinChosen)).remove(combination.get(firstBinChosen).get(secondBinChosen));
+                    // L'enlever de combination
+                    combination.get(combination.indexOf(firstBinChosen)).remove(combination.get(firstBinChosen).get(secondBinChosen));
 
-                if (combination.get(firstBinChosen).isEmpty()) {
-                    combination.remove(firstBinChosen);
-                    numberOfBinInFirstSolution = combination.size();
+                    if (combination.get(firstBinChosen).isEmpty()) {
+                        combination.remove(firstBinChosen);
+                        numberOfBinInFirstSolution = combination.size();
+                    }
+                }
+
+                if(newSolution != null) {
+                    newSolution.calculFitness();
+                    newSolution.setApplication(this.population.getIndividuals().get(0).getApplication());
+                    this.population.addIndividual(newSolution);
                 }
             }
-
-            this.population.addIndividual(newSolution);
-        }
+        }*/
     }
 
     /**
      *
      */
     private void evolvePopulation() {
+        Random random = new Random();
+
         this.population = this.tournamentSelection();
 
-        /*this.performCrossover();
+        this.performCrossover();
 
-        this.mutate();*/
+        this.mutate(this.population.getIndividuals().get(random.nextInt(this.population.getPopulationSize() - 1)));
     }
 
     /**
      *
      */
-    private void apocalypse() {
-        // MÃ©thode tabou
+    private Solution apocalypse() {
+        // Renvoyer la meilleure solution de la dernière génération.
+        return this.population.getBestSolution();
     }
 
     /**
@@ -183,23 +225,22 @@ public class Optimization
 
             secondImage = copySecondBinChoosen.getRectangles().get(chosenIndex);
 
-            if(secondImage.compareTo(firstImage) > 0) {
-                secondImage.setDimension(firstImage.getDimension());
+            if(secondImage.getId() != firstImage.getId()) {
 
-                if (secondImage.getPosition().getX() + secondImage.getDimension().getLX() <= copySecondBinChoosen.getDimension().getLX()
-                        && secondImage.getPosition().getY() + secondImage.getDimension().getLY() <= copySecondBinChoosen.getDimension().getLY()) {
-                    isSecondImageChosen = this.canFirstImageReplacedSecondImage(copySecondBinChoosen, secondImage);
+                if (secondImage.compareTo(firstImage) > 0) {
+                    secondImage.setDimension(firstImage.getDimension());
+
+                    if (secondImage.getPosition().getX() + secondImage.getDimension().getLX() <= copySecondBinChoosen.getDimension().getLX()
+                            && secondImage.getPosition().getY() + secondImage.getDimension().getLY() <= copySecondBinChoosen.getDimension().getLY()) {
+                        isSecondImageChosen = this.canFirstImageReplacedSecondImage(copySecondBinChoosen, secondImage);
+                    }
+                } else {
+                    isSecondImageChosen = true;
                 }
-            } else {
-                isSecondImageChosen = true;
-            }
 
-            if(isSecondImageChosen) {
-                //Vérifier si la deuxième image rentre bien dans la première
-            }
-
-            if(!isSecondImageChosen && iterationNumber == 500) {
-                chosenIndex = 0;
+                if (!isSecondImageChosen && iterationNumber == 500) {
+                    chosenIndex = 0;
+                }
             }
         }
 
@@ -240,14 +281,18 @@ public class Optimization
         Solution solution = new Solution(this.population.getIndividuals().get(0));
         Rectangle imageFirstBin = solution.getBins().get(firstBinIndex).getRectangles().get(indexImageFirstBin);
         Rectangle imageSecondBin = solution.getBins().get(secondBinIndex).getRectangles().get(indexImageSecondBin);
-        Position secondImagePosition;
-        /*Dimension dimensionFirstRectangle = this.getImagePlusFreeAreaDimension(imageFirstBin, firstBinIndex);
-        Dimension dimensionSecondRectangle = this.getImagePlusFreeAreaDimension(imageSecondBin, secondBinIndex);
-        imageFirstBin.setDimension(dimensionSecondRectangle);
-        imageSecondBin.setDimension(dimensionFirstRectangle);*/
+        Position secondImagePosition = null;
+
+        // Image2 dans rectangle 1
         secondImagePosition = imageSecondBin.getPosition();
         imageSecondBin.setPosition(imageFirstBin.getPosition());
+        solution.getBins().get(firstBinIndex).getRectangles().remove(imageFirstBin);
+        solution.getBins().get(firstBinIndex).getRectangles().add(imageSecondBin);
+
+        // Image1 dans rectangle 2
         imageFirstBin.setPosition(secondImagePosition);
+        solution.getBins().get(secondBinIndex).getRectangles().remove(imageSecondBin);
+        solution.getBins().get(secondBinIndex).getRectangles().add(imageFirstBin);
 
         return solution;
     }
@@ -262,37 +307,89 @@ public class Optimization
     // Mutate an individual
     private void mutate(Solution individual) {
         Random random = new Random();
-
+        boolean add;
         boolean mutation = new Random().nextInt(this.mutationProbabilityIndex)==0;
+        boolean canFitImage = false;
+        Rectangle image;
+        Bin chosenBin;
+        Packing packing = new Packing();
+        Solution newSolution;
+        int chosenBinId;
 
         if(mutation) {
-            
+            add = random.nextBoolean();
+
+            while (!canFitImage) {
+                image = individual.getApplication().get(random.nextInt(individual.getApplication().size() - 1));
+                chosenBinId = random.nextInt(individual.getBins().size() - 1);
+                chosenBin = individual.getBins().get(chosenBinId);
+
+                if (add) {
+                    newSolution = this.addImageToBin(individual, packing, chosenBinId, image);
+                    canFitImage = newSolution != null;
+                } else {
+                    chosenBin.getRectangles().remove(image);
+                    chosenBin.getFreeRectangles().add(image);
+                    canFitImage = true;
+                }
+            }
         }
     }
 
-    // Roulette
+    private Solution addImageToBin(Solution individual, Packing packing, int chosenBinId, Rectangle image) {
+        Solution newSolution = new Solution(individual);
+        Rectangle freeRectangle;
+        Bin chosenBin = newSolution.getBins().get(chosenBinId);
+
+        freeRectangle = packing.findFreeRectangle(chosenBin, image, null, 0, 0);
+
+        if (freeRectangle != null) {
+            //Ajouter l'image
+            image.setPosition(freeRectangle.getPosition());
+            chosenBin.getRectangles().add(image);
+
+            //Calculer les nouveaux freeRectangles, les ajouter et supprimer le freeRectangle d'origine
+            packing.split(chosenBin, image, freeRectangle);
+        } else {
+            newSolution = null;
+        }
+
+        return newSolution;
+    }
+
     private Population tournamentSelection() {
-        Random random = new Random();
         Population nextGeneration = new Population(this.population.getPopulationSize());
+        CustomHashMap<Solution, Double> selection = new CustomHashMap<>();
+        double totalFitness = this.population.getTotalFitness();
+        Random random = new Random();
+        double chosenNumber = 0;
+        Rectangle rectangle = null;
+
+        for(Solution solution : this.population.getIndividuals()) {
+            selection.put(solution,  (solution.getFitness() / totalFitness) / nextGeneration.getPopulationSize() - 1);
+        }
 
         for (int i = 0; i < nextGeneration.getPopulationSize(); i++) {
-            int randomId = random.nextInt(nextGeneration.getPopulationSize());
-            nextGeneration.addIndividual(this.population.getIndividuals().get(randomId));
+            chosenNumber = random.nextDouble();
+            nextGeneration.addIndividual(this.getSolution(chosenNumber, selection));
         }
 
-        return nextGeneration;
+        return  nextGeneration;
     }
 
-    /**
-     *
-     * @return
-     */
-    private Double solve(Solution solution) {
-        // First, resolve simplex for the initial solution
-        Simplex simplex = new Simplex(solution);
+    private Solution getSolution(double chosenNumber, CustomHashMap<Solution, Double> selection) {
+        Solution chosenSolution = null;
+        double rate = 0;
 
-        simplex.solve();
+        for(int i = 0; i < selection.keySet().size(); i++) {
+            rate += selection.get(selection.indexOf(i)).doubleValue();
 
-        return  simplex.getPointValuePair().getValue();
+            if(rate >= chosenNumber && chosenSolution == null) {
+                chosenSolution = selection.indexOf(i);
+                break;
+            }
+        }
+
+        return chosenSolution;
     }
 }

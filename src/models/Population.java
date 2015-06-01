@@ -41,4 +41,26 @@ public class Population {
     public void addIndividual(Solution individual) {
         this.individuals.add(individual);
     }
+
+    public Solution getBestSolution() {
+        Solution bestSolution = null;
+
+        for(Solution solution : this.getIndividuals()) {
+            if(bestSolution == null || solution.getFitness() > bestSolution.getFitness()) {
+                bestSolution = solution;
+            }
+        }
+
+        return bestSolution;
+    }
+
+    public double getTotalFitness() {
+        double total = 0;
+
+        for(Solution solution : this.getIndividuals()) {
+            total += solution.getFitness();
+        }
+
+        return  total;
+    }
 }

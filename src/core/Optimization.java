@@ -298,7 +298,7 @@ public class Optimization
 
         if(!(allImagesArePresent(firstIndividual) && allImagesArePresent(secondIndividual))) {
             // reverse
-            secondIndividual.replaceBin(secondRandomBin, firstRandomBin);
+            firstIndividual.replaceBin(secondRandomBin, firstRandomBin);
             secondIndividual.replaceBin(firstRandomBin, secondRandomBin);
         }
 

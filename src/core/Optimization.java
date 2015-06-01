@@ -273,7 +273,7 @@ public class Optimization
         boolean mutation = new Random().nextInt(this.mutationProbabilityIndex)==0;
 
         if(mutation) {
-            
+
         }
     }
 

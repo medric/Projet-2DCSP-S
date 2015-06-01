@@ -46,7 +46,7 @@ public class Population {
         Solution bestSolution = null;
 
         for(Solution solution : this.getIndividuals()) {
-            if(bestSolution == null || solution.getFitness() > bestSolution.getFitness()) {
+            if(bestSolution == null || solution.getFitness() < bestSolution.getFitness()) {
                 bestSolution = solution;
             }
         }

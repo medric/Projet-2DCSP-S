@@ -130,7 +130,7 @@ public class Solution {
      * Sets fitness
      * @return
      */
-    public void calculFitness() {
+    public void calculFitness() throws Exception {
         // First, resolve simplex for the initial solution
         Simplex simplex = new Simplex(this);
 

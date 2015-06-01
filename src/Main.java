@@ -15,6 +15,8 @@ public class Main {
 
         try {
             File file = new File("./data/data_20Salpha.txt");
+            int numberOfGeneration = 50;
+            int populationSize = 6;
 
             DataModel dm = new DataModel(file);
 
@@ -23,14 +25,11 @@ public class Main {
             Solution solution = packing.pack();
             solution.setApplication(dm.getRectangles());
 
-            // First, resolve simplex for the initial solution
-            Simplex simplex = new Simplex(solution);
+            Optimization optimization = new Optimization(numberOfGeneration, populationSize, solution);
 
-            simplex.solve();
+            Solution bestSolution = optimization.optimize();
 
-            Optimization optimization = new Optimization(50, 6, solution);
-
-            optimization.optimize();
+            System.out.println(String.format("fitness of best solution is %0$s", bestSolution.getFitness()));
 
         } catch (Exception e) {
            // TODO identify exceptions

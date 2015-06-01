@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * Created by Epulapp on 30/05/2015.
+ * Custom HashMap class.
+ * add methods to HashMap.
+ *
+ * @author Medric, Gabi, P-J
+ * @version 1.0
  */
 public class CustomHashMap<K,V> extends HashMap<K,V> {
 
@@ -12,6 +16,11 @@ public class CustomHashMap<K,V> extends HashMap<K,V> {
         super();
     }
 
+    /**
+     * Return key object according to his index
+     * @param index the index of key
+     * @return Key object
+     */
     public K indexOf(int index) {
         K key = null;
         int i = 1;

@@ -10,12 +10,13 @@ import core.Packing;
  * Created by Medric on 18/04/2015.
  */
 public class Main {
+    static final File file = new File("./data/data_20Salpha.txt");
+    static final int numberOfGeneration = 50;
+    static final int populationSize = 6;
+
     public static void main(String[] args) {
 
         try {
-            File file = new File("./data/data_20Salpha.txt");
-            int numberOfGeneration = 50;
-            int populationSize = 6;
 
             DataModel dm = new DataModel(file);
 

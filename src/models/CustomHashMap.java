@@ -23,7 +23,7 @@ public class CustomHashMap<K,V> extends HashMap<K,V> {
      */
     public K indexOf(int index) {
         K key = null;
-        int i = 1;
+        int i = 0;
         K value = null;
         Iterator<K> iterator = this.keySet().iterator();
 

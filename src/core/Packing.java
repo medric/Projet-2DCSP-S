@@ -44,6 +44,9 @@ public class Packing
         return  this.rectangles;
     }
 
+    public void setSolution(Solution solution) {
+        this.solution = solution;
+    }
 
     /**
      * @param bin

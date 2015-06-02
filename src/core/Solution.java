@@ -43,7 +43,9 @@ public class Solution {
      * @param solution
      */
     public Solution(Solution solution) {
+        this.application = solution.getApplication();
         this.bins = (ArrayList<Bin>)solution.bins.clone();
+        this.setPatternUnitCost(solution.getPatternUnitCost());
     }
 
     public double getFitness() {
@@ -136,7 +138,11 @@ public class Solution {
 
         simplex.solve();
 
-        this.fitness = simplex.getPointValuePair().getValue();
+        try {
+            this.fitness = simplex.getPointValuePair().getValue();
+        }catch(NullPointerException ex){
+            System.out.println();
+        }
     }
 
     /**

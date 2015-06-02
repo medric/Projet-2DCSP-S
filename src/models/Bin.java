@@ -145,12 +145,13 @@ public class Bin {
     /**
      * @param rectangles new list of rectangle
      */
-    public void setRectangles(ArrayList<Rectangle> rectangles) {
+    public void setRectangles(List<Rectangle> rectangles) {
         Rectangle newRectangle = null;
         this.rectangles = new ArrayList();
 
         for(Rectangle rectangle : rectangles) {
             newRectangle = new Rectangle();
+            newRectangle.setId(rectangle.getId());
             newRectangle.setDimension(new Dimension(rectangle.getDimension()));
             newRectangle.setPosition(new Position(rectangle.getPosition()));
 
@@ -196,8 +197,12 @@ public class Bin {
 
         for(Rectangle rectangle : this.rectangles) {
             // The comparison is based on the dimension
-            if(rectangle.getDimension().equals(_rectangle.getDimension())) {
-                repetition++;
+            try {
+                if (rectangle.getId().equals(_rectangle.getId())) {
+                    repetition++;
+                }
+            }catch(NullPointerException ex) {
+                System.out.println();
             }
         }
 

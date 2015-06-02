@@ -59,13 +59,14 @@ public class Simplex {
      *  Sets up the function to minimize for the given solution.
      */
     private void setUpFitness() throws Exception {
-        double cost = this.solution.getPatternUnitCost();
+        double cost = this.solution.getBins().get(0).getCost();
         int nbOfPatterns = this.solution.getBins().size();
 
         double constantTerm = (nbOfPatterns * cost);
 
         // x1 ... xn define the number of patterns to print
         double[] coefficients = new double[nbOfPatterns];
+        System.out.println(nbOfPatterns);
         for(int i = 0; i < nbOfPatterns; i++) {
             coefficients[i] = 1;
         }
@@ -78,7 +79,13 @@ public class Simplex {
      */
     public void solve() throws TooManyIterationsException, UnboundedSolutionException, NoFeasibleSolutionException {
         // Optimize given the current linear objective function and previously set constraints
-        this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints)));
+        try {
+            this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints)));
+        }catch(UnboundedSolutionException ex) {
+            System.out.println();
+        }catch(NoFeasibleSolutionException ex) {
+            System.out.println();
+        }
     }
 
     public PointValuePair getPointValuePair() {

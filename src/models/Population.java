@@ -55,7 +55,7 @@ public class Population {
     }
 
     public double getTotalFitness() {
-        double total = 0;
+        double total = 0d;
 
         for(Solution solution : this.getIndividuals()) {
             total += solution.getFitness();

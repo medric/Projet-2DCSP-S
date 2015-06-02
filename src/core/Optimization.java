@@ -1,6 +1,7 @@
 package core;
 
 import models.*;
+
 import java.util.logging.*;
 
 import java.util.*;
@@ -21,16 +22,16 @@ public class Optimization
     private static final int MUTATION_INIT_VALUE = 2;
     private static final int CROSSOVER_NUMBER = 2;
     private static final int CROSSOVER_INIT_VALUE = 2;
-    private static final int INIT_NB_IMAGES_SWITCHES = 2;
+    private static final int INIT_NB_IMAGES_SWITCHES = 1;
     private static final int NUMBER_OF_ITERATIONS = 500;
+    private static final Logger LOGGER = Logger.getLogger(Optimization.class.getName());
 
     private Population population;
     private int generationNumber;
     private int mutationProbabilityIndex;
-    private int switchImageProbabilty;
+    private int switchImageProbability;
     private Random random;
     private int numberOfImagesSwitches;
-    private Logger logger = Logger.getLogger("Log");
     private FileHandler fileHandler;
     private int currentGenerationIndex;
 
@@ -49,12 +50,15 @@ public class Optimization
         this.currentGenerationIndex = 1;
 
         this.mutationProbabilityIndex = MUTATION_INIT_VALUE; // Will give a 1/2 probability
-        this.switchImageProbabilty = CROSSOVER_INIT_VALUE;
+        this.switchImageProbability = CROSSOVER_INIT_VALUE;
 
         this.numberOfImagesSwitches = INIT_NB_IMAGES_SWITCHES;
 
-        fileHandler = new FileHandler("C:\\Users\\Epulapp\\Desktop\\optimisation\\Projet-2DCSP-S\\Optimization.log");
-        logger.addHandler(fileHandler);
+        SimpleFormatter formatter = new SimpleFormatter();
+        fileHandler = new FileHandler("./Optimizations.log");
+
+        LOGGER.addHandler(fileHandler);
+        fileHandler.setFormatter(formatter);
     }
 
     /**
@@ -81,16 +85,17 @@ public class Optimization
      */
     private void genesis() throws Exception {
         int cpt = 0;
-        int chosenBinId = 0;
-        Solution newSolution = null;
+        int chosenBinId;
+        Solution newSolution;
         Rectangle image;
         Packing packing = new Packing();
         ArrayList<Rectangle> imagesToPlace;
 
-        for(int i = 1; i < this.population.getPopulationSize(); i++) {
+        for(int i = 0; i < this.population.getPopulationSize(); i++) {
             newSolution = null;
+
             // Choose random image of image to place
-            image = this.population.getIndividuals().get(0).getApplication().get(random.nextInt(this.population.getIndividuals().get(0).getApplication().size()));
+            image = new Rectangle(this.population.getIndividuals().get(0).getApplication().get(random.nextInt(this.population.getIndividuals().get(0).getApplication().size())));
 
             // GENESIS_REPETITIONS essay to add image to a random bin
             while (cpt < GENESIS_REPETITIONS) {
@@ -123,11 +128,8 @@ public class Optimization
      * Evolves from genesis to apocalypse.
      */
     private void evolvePopulation(int numberOfCrossover) throws Exception {
-        //boolean check = this.check();
         // Build next generation
         this.population = this.tournamentSelection();
-
-        //check = this.check();
 
         // Performs crossover
         for(int i = 0; i < numberOfCrossover; i++) {
@@ -142,25 +144,16 @@ public class Optimization
             this.performCrossover(firstSolution, secondSolution);
         }
 
-        //check = this.check();
         // Performs mutation
         this.mutate(this.getRandomSolutionOverCurrentPopulation());
-
-        //check = this.check();
     }
 
     /**
      * Get a random individual from actual population
      * @return Chosen solution
      */
-    private Solution getRandomSolutionOverCurrentPopulation() {
-        Solution solution = this.population.getIndividuals().get(random.nextInt(this.population.getPopulationSize() - 1));
-
-        if(solution==null){
-            System.out.println();
-        }
-
-        return solution;
+    private Solution getRandomSolutionOverCurrentPopulation() throws Exception {
+        return this.population.getIndividuals().get(random.nextInt(this.population.getPopulationSize() - 1));
     }
 
     /**
@@ -183,7 +176,7 @@ public class Optimization
         Rectangle firstImageToSwitch;
 
         int indexOfSecondImageToSwitch;
-        int indexOfImage = 0;
+        int indexOfImage;
 
         // Choose a random image from the first bin
         indexOfImage = random.nextInt(firstBinChosen.getRectangles().size());
@@ -326,7 +319,7 @@ public class Optimization
         }
 
         // Switch images
-        boolean imagesSwitch = random.nextInt(this.switchImageProbabilty)==0;
+        boolean imagesSwitch = random.nextInt(this.switchImageProbability)==0;
 
         if(imagesSwitch) {
             for(int i = 0; i < this.numberOfImagesSwitches; i++) {
@@ -355,22 +348,7 @@ public class Optimization
      * @return
      */
     private boolean allImagesArePresent(Solution solutionToCheck) {
-        ArrayList<int[]> vectors = solutionToCheck.getSolutionVectors();
-        ArrayList<Integer> result = new ArrayList<Integer>();
-
-        //Additionne tous les vecteurs
-        for(int index = 0; index < solutionToCheck.getApplication().size(); index++) {
-            int value = 0;
-
-            for(int[] vector : vectors) {
-                value += vector[index];
-
-                result.add(value);
-            }
-        }
-
-        return !result.contains(0);
-        /*ArrayList<Integer> imagesIndex = new ArrayList<Integer>();
+        ArrayList<Integer> imagesIndex = new ArrayList<Integer>();
 
         for(Bin bin : solutionToCheck.getBins()) {
             for(Rectangle image : bin.getRectangles()) {
@@ -380,7 +358,7 @@ public class Optimization
             }
         }
 
-        return imagesIndex.size() == solutionToCheck.getApplication().size();*/
+        return imagesIndex.size() == solutionToCheck.getApplication().size();
     }
 
     /**
@@ -392,10 +370,12 @@ public class Optimization
         boolean add;
         boolean mutation = random.nextInt(this.mutationProbabilityIndex)==0;
         boolean canFitImage = false;
+
         Rectangle image;
         Bin chosenBin;
         Packing packing = new Packing();
         Solution newSolution;
+
         int chosenBinId;
 
         if(mutation) {
@@ -494,34 +474,19 @@ public class Optimization
         for (int i = 0; i < nextGeneration.getPopulationSize(); i++) {
             chosenNumber = random.nextDouble();
             newIndividual = this.getSelectedSolutionByRouletteWheel(chosenNumber, selection);
-            try {
-                newIndividual.calculFitness();
-                nextGeneration.addIndividual(newIndividual);
-            }catch (NullPointerException ex) {
-                System.out.println();
-            }
+
+            newIndividual.calculFitness();
+            nextGeneration.addIndividual(newIndividual);
         }
 
         return nextGeneration;
     }
 
-    private boolean check(){
-        boolean result = true;
-
-        for(Solution solution : this.population.getIndividuals()) {
-            if(!this.allImagesArePresent(solution)) {
-                result = false;
-            }
-        }
-
-        return result;
-    }
-
     private void logPopulation(){
         for(Solution individual : this.population.getIndividuals()) {
-            logger.info(String.format("Generation number %0$s",this.currentGenerationIndex));
-            logger.info(String.format("Number of bins : %0$s",individual.getBins().size()));
-            logger.info(String.format("Fitness : %0$s\r\n",individual.getFitness()));
+            LOGGER.info(String.format("Generation number %0$s", this.currentGenerationIndex));
+            LOGGER.info(String.format("Number of bins : %0$s", individual.getBins().size()));
+            LOGGER.info(String.format("Fitness : %0$s\r\n", individual.getFitness()));
         }
     }
 

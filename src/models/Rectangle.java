@@ -11,10 +11,14 @@ public class Rectangle implements Comparable<Rectangle> {
     protected Integer quantity;
     protected  Integer id;
 
+    public Rectangle() {}
+
     /**
-     * Default constructor.
+     * Copy constructor.
      */
-    public Rectangle() {
+    public Rectangle(Rectangle rectangle) {
+        this(rectangle.getDimension());
+        this.setId(rectangle.getId());
     }
 
     /**

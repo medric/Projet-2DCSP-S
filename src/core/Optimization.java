@@ -1,6 +1,7 @@
 package core;
 
 import models.*;
+import org.apache.commons.math3.optim.PointValuePair;
 
 import java.util.logging.*;
 
@@ -85,13 +86,14 @@ public class Optimization
      */
     private void genesis() throws Exception {
         int cpt = 0;
+        int retry = 0;
         int chosenBinId;
         Solution newSolution;
         Rectangle image;
         Packing packing = new Packing();
         ArrayList<Rectangle> imagesToPlace;
 
-        for(int i = 0; i < this.population.getPopulationSize(); i++) {
+        for(int i = this.population.getIndividuals().size(); i < this.population.getPopulationSize(); i++) {
             newSolution = null;
 
             // Choose random image of image to place
@@ -109,7 +111,7 @@ public class Optimization
             if(newSolution == null) {
                 newSolution = new Solution(this.population.getIndividuals().get(0));
                 newSolution.getBins().add(new Bin(this.population.getIndividuals().get(0).getBins().get(0)));
-                imagesToPlace = (ArrayList<Rectangle>)((ArrayList<Rectangle>)this.population.getIndividuals().get(0).getApplication()).clone();
+                imagesToPlace = this.copyListOfImages(this.population.getIndividuals().get(0).getApplication());
                 packing.setRectangles(imagesToPlace);
                 packing.getRectangles().add(image);
                 packing.setSolution(newSolution);
@@ -119,9 +121,29 @@ public class Optimization
             // Copy list of image to place from adam to new individual
             newSolution.setApplication(this.population.getIndividuals().get(0).getApplication());
 
-            newSolution.calculFitness();
-            this.population.addIndividual(newSolution);
+            if(newSolution.calculFitness()) {
+                this.population.addIndividual(newSolution);
+            } else {
+                retry++;
+                if(retry <= NUMBER_OF_ITERATIONS) {
+                    i--;
+                }
+            }
         }
+    }
+
+    private ArrayList<Rectangle> copyListOfImages(List<Rectangle> origin) {
+        ArrayList<Rectangle> copy = new ArrayList<Rectangle>();
+        Rectangle newRectangle;
+
+        for(Rectangle image : origin) {
+            newRectangle = new Rectangle(image.getDimension(), image.getQuantity());
+            newRectangle.setPosition(new Position(0,0));
+            newRectangle.setId(image.getId());
+            copy.add(newRectangle);
+        }
+
+        return copy;
     }
 
     /**
@@ -132,7 +154,8 @@ public class Optimization
         this.population = this.tournamentSelection();
 
         // Performs crossover
-        for(int i = 0; i < numberOfCrossover; i++) {
+        while(this.population.getIndividuals().size() < this.population.getPopulationSize()) {
+        //for(int i = this.population.getIndividuals().size(); i < this.population.getPopulationSize(); i++) {
             // Choose random first individual from the new generation for crossover
             Solution firstSolution = this.getRandomSolutionOverCurrentPopulation();
             Solution secondSolution;
@@ -141,7 +164,7 @@ public class Optimization
             while (firstSolution.equals(secondSolution = this.getRandomSolutionOverCurrentPopulation())) ;
 
             // Performs crossover
-            //this.performCrossover(firstSolution, secondSolution);
+            this.performCrossover(firstSolution, secondSolution);
         }
 
         // Performs mutation
@@ -153,7 +176,7 @@ public class Optimization
      * @return Chosen solution
      */
     private Solution getRandomSolutionOverCurrentPopulation() throws Exception {
-        return this.population.getIndividuals().get(random.nextInt(this.population.getPopulationSize() - 1));
+        return this.population.getIndividuals().get(random.nextInt(this.population.getIndividuals().size()));
     }
 
     /**
@@ -304,40 +327,61 @@ public class Optimization
      * @param secondIndividual Second individual chosen for crossover
      */
     private void performCrossover(Solution firstIndividual, Solution secondIndividual) throws Exception {
-        // Select 2 bins
-        Bin firstRandomBin = this.getRandomBin(firstIndividual);
-        Bin secondRandomBin = this.getRandomBin(secondIndividual);
+        Solution children = null;
+        Bin firstRandomBin;
+        Bin secondRandomBin;
+        Bin firstRandomBinSwitchImage;
+        Bin secondRandomBinSwitchImage;
+        boolean performCrossover = true;
+        boolean firstIndividu = false;
 
-        //Switch bins
-        firstIndividual.replaceBin(firstRandomBin, secondRandomBin);
-        secondIndividual.replaceBin(secondRandomBin, firstRandomBin);
+        for(int j = 0; j < CROSSOVER_NUMBER; j++){
+            firstIndividu = !firstIndividu;
 
-        if(!(allImagesArePresent(firstIndividual) && allImagesArePresent(secondIndividual))) {
-            // reverse
-            firstIndividual.replaceBin(secondRandomBin, firstRandomBin);
-            secondIndividual.replaceBin(firstRandomBin, secondRandomBin);
-        }
+            for (int l = 0; l < CROSSOVER_NUMBER; l++) {
+                children = new Solution(firstIndividu ? firstIndividual : secondIndividual);
 
-        // Switch images
-        boolean imagesSwitch = random.nextInt(this.switchImageProbability)==0;
+                // Select 2 bins
+                firstRandomBin = this.getRandomBin(firstIndividual);
+                secondRandomBin = this.getRandomBin(secondIndividual);
 
-        if(imagesSwitch) {
-            for(int i = 0; i < this.numberOfImagesSwitches; i++) {
-
-                Bin alpha = this.getRandomBin(firstIndividual);
-                Bin beta = this.getRandomBin(secondIndividual);
-                Bin copyAlpha = new Bin(alpha);
-                copyAlpha.setRectangles(alpha.getRectangles());
-                Bin copyBeta = new Bin(beta);
-                copyBeta.setRectangles(beta.getRectangles());
-
-                this.switchImage(alpha, beta);
+                //Switch bins
+                children.replaceBin(firstRandomBin, secondRandomBin);
 
                 //Reverse
-                if(!(allImagesArePresent(firstIndividual) && allImagesArePresent(secondIndividual))) {
-                    alpha.setRectangles(copyAlpha.getRectangles());
-                    beta.setRectangles(copyBeta.getRectangles());
+                if (!this.allImagesArePresent(children)) {
+                    children.replaceBin(secondRandomBin, firstRandomBin);
+                    performCrossover = false;
                 }
+
+                // Switch images
+               /* boolean imagesSwitch = random.nextInt(this.switchImageProbability) == 0;
+
+                if (imagesSwitch) {
+                    for (int i = 0; i < this.numberOfImagesSwitches; i++) {
+                        firstRandomBinSwitchImage = this.getRandomBin(children);
+                        secondRandomBinSwitchImage = this.getRandomBin(secondIndividual);
+
+                        this.switchImage(firstRandomBin, secondRandomBin);
+
+                        //Reverse
+                        if (!this.allImagesArePresent(children)) {
+                            this.switchImage(firstRandomBin, secondRandomBin);
+                        } else {
+                            performCrossover = true;
+                        }
+                    }
+                }*/
+            }
+
+            if(performCrossover && children != null && this.allImagesArePresent(children)) {
+                if(children.calculFitness()) {
+                    this.population.addIndividual(children);
+                }
+            }
+
+            if(this.population.getIndividuals().size() == this.population.getPopulationSize()) {
+                j = CROSSOVER_NUMBER;
             }
         }
     }
@@ -458,63 +502,46 @@ public class Optimization
      * @throws Exception
      */
     private Population tournamentSelection() throws Exception {
+        Solution newSolution;
+
         this.logPopulation();
 
         Population nextGeneration = new Population(this.population.getPopulationSize());
-        CustomHashMap<Solution, Double> selection = new CustomHashMap<Solution, Double>();
-        double totalFitness = this.population.getTotalFitness();
-        double chosenNumber;
-        Solution newIndividual;
 
-        // build pie chart for roulette wheel.
-        for(Solution solution : this.population.getIndividuals()) {
-            // We devide by nextGeneration.getPopulationSize() - 1 for the smallest fitness has the bigger part of pie chaart
-            selection.put(solution,  ((1-(solution.getFitness() / totalFitness)) / (nextGeneration.getPopulationSize() - 1)));
-        }
+        this.buildSelection(nextGeneration);
 
-        // Choose individual according to random number
-        for (int i = 0; i < nextGeneration.getPopulationSize(); i++) {
-            chosenNumber = random.nextDouble();
-            newIndividual = this.getSelectedSolutionByRouletteWheel(chosenNumber, selection);
-
-            newIndividual.calculFitness();
-            nextGeneration.addIndividual(newIndividual);
+        for(int i = 0; i < this.population.getPopulationSize() / 3; i++) {
+            nextGeneration.addIndividual(this.population.getIndividuals().get(i));
         }
 
         return nextGeneration;
     }
 
+    private SortedMap<Double, Solution> buildSelection(Population generation) {
+        SortedMap<Double, Solution> selection = new TreeMap<Double, Solution>();
+
+        double totalFitness = this.population.getTotalFitness();
+
+        // build pie chart for roulette wheel.
+        for(Solution solution : this.population.getIndividuals()) {
+            // We devide by nextGeneration.getPopulationSize() - 1 for the smallest fitness has the bigger part of pie chaart
+            selection.put(solution.getFitness(), solution);
+        }
+
+        return  selection;
+    }
+
     private void logPopulation(){
+        int cpt = 1;
         for(Solution individual : this.population.getIndividuals()) {
             LOGGER.info(String.format("Generation number %0$s", this.currentGenerationIndex));
             LOGGER.info(String.format("Number of bins : %0$s", individual.getBins().size()));
+            for(int i = 0; i < individual.getSimplex().getPointValuePair().getKey().length; i++) {
+                LOGGER.info(String.format("Nombre de fois qu'on doit imprimer le pattern %1$s : %2$s", cpt, individual.getSimplex().getPointValuePair().getKey()[i]));
+                cpt++;
+            }
             LOGGER.info(String.format("Fitness : %0$s\r\n", individual.getFitness()));
         }
-    }
-
-    /**
-     * Get solution which is selected by roulette wheel algorithm
-     * @param chosenNumber Random number generated
-     * @param selection pie chart
-     * @return Solution which is selected by roulette wheel algorithm
-     */
-    private Solution getSelectedSolutionByRouletteWheel(double chosenNumber, CustomHashMap<Solution, Double> selection) throws Exception {
-        Solution chosenSolution = null;
-        double rate = 0;
-
-        // While rate < chosenNumber
-        for(int i = 0; i < selection.keySet().size(); i++) {
-            rate += selection.get(selection.indexOf(i)).doubleValue();
-
-            // If new rate > chosenNumber, we have found the selected individual
-            if (rate >= chosenNumber && chosenSolution == null) {
-
-                chosenSolution = new Solution(selection.indexOf(i));
-                break;
-            }
-        }
-
-        return chosenSolution;
     }
 
     /**

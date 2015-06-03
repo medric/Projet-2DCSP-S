@@ -1,7 +1,9 @@
 package core;
 
 import models.Bin;
+import models.Position;
 import models.Rectangle;
+import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ public class Solution {
     private ArrayList<Bin> bins;
     private double patternUnitCost;
     private double fitness;
+    private Simplex simplex;
 
     /**
      *  Constructor.
@@ -61,6 +64,10 @@ public class Solution {
         return bins;
     }
 
+    public Simplex getSimplex() {
+        return this.simplex;
+    }
+
     /**
      * Set the list of patterns for the current solution.
      *
@@ -85,7 +92,15 @@ public class Solution {
      * @param application
      */
     public void setApplication(List<Rectangle> application) {
-        this.application = application;
+        this.application = new ArrayList<Rectangle>();
+        Rectangle newRectangle;
+
+        for(Rectangle image : application) {
+            newRectangle = new Rectangle(image.getDimension(), image.getQuantity());
+            newRectangle.setPosition(new Position(0,0));
+            newRectangle.setId(image.getId());
+            this.application.add(newRectangle);
+        }
     }
 
     /**
@@ -132,17 +147,19 @@ public class Solution {
      * Sets fitness
      * @return
      */
-    public void calculFitness() throws Exception {
+    public boolean calculFitness() throws Exception {
+        boolean solved = true;
         // First, resolve simplex for the initial solution
-        Simplex simplex = new Simplex(this);
-
-        simplex.solve();
+        this.simplex = new Simplex(this);
 
         try {
+            simplex.solve();
             this.fitness = simplex.getPointValuePair().getValue();
-        }catch(NullPointerException ex){
-            System.out.println();
+        }catch(UnboundedSolutionException ex){
+            solved = false;
         }
+
+        return solved;
     }
 
     /**

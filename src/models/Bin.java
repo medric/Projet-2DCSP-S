@@ -61,9 +61,15 @@ public class Bin {
         Rectangle firstSubFreeRectangle;
         Rectangle secondSubFreeRectangle;
 
+        double x1 = 0d;
+        double y1 = 0d;
         // firstSubFreeRectangle
-        double x1 = freeRectangle.getPosition().getX() + rectangle.getDimension().getLX();
-        double y1 = freeRectangle.getPosition().getY();
+        try {
+            x1 = freeRectangle.getPosition().getX() + rectangle.getDimension().getLX();
+            y1 = freeRectangle.getPosition().getY();
+        }catch(NullPointerException ex) {
+            System.out.println();
+        }
 
         double LX = freeRectangle.getDimension().getLX() - rectangle.getDimension().getLX();
         double LY = freeRectangle.getDimension().getLY();

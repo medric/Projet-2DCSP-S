@@ -3,6 +3,7 @@ package core;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.linear.*;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,8 +51,12 @@ public class Simplex {
                 coefficients[j] = value;
             }
 
-            this.constraints.add(new LinearConstraint(coefficients,
-                    Relationship.GEQ, this.solution.getApplication().get(i).getQuantity()));
+            try {
+                this.constraints.add(new LinearConstraint(coefficients,
+                        Relationship.GEQ, this.solution.getApplication().get(i).getQuantity()));
+            }catch(NullPointerException ex) {
+                System.out.println();
+            }
         }
     }
 
@@ -80,9 +85,7 @@ public class Simplex {
     public void solve() throws TooManyIterationsException, UnboundedSolutionException, NoFeasibleSolutionException {
         // Optimize given the current linear objective function and previously set constraints
         try {
-            this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints)));
-        }catch(UnboundedSolutionException ex) {
-            ex.printStackTrace();
+            this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints), GoalType.MINIMIZE, new NonNegativeConstraint(true), PivotSelectionRule.BLAND));
         }catch(NoFeasibleSolutionException ex) {
             ex.printStackTrace();
         }

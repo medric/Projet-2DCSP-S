@@ -14,8 +14,8 @@ import core.Packing;
  */
 public class Main {
     static final File file = new File("./data/data_20Lalpha.txt");
-    static final int numberOfGeneration = 1500;
-    static final int populationSize = 6;
+    static final int numberOfGeneration = 500;
+    static final int populationSize = 2000;
 
     public static void main(String[] args) {
 

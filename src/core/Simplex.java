@@ -1,7 +1,5 @@
 package core;
 
-import models.Bin;
-import models.Rectangle;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.linear.*;
@@ -84,27 +82,9 @@ public class Simplex {
         try {
             this.setPointValuePair(this.solver.optimize(f, new LinearConstraintSet(this.constraints)));
         }catch(UnboundedSolutionException ex) {
-            ArrayList<Integer> i = new ArrayList<Integer>();
-            for(Bin bin : solution.getBins()) {
-                for(Rectangle r : bin.getRectangles()) {
-                    if(!i.contains(r.getId())) {
-                        i.add(r.getId());
-                    }
-                }
-            }
-            System.out.println(i);
+            ex.printStackTrace();
         }catch(NoFeasibleSolutionException ex) {
-            ArrayList<Integer> i = new ArrayList<Integer>();
-            for(Bin bin : solution.getBins()) {
-                for(Rectangle r : bin.getRectangles()) {
-                    if(!i.contains(r.getId())) {
-                        i.add(r.getId());
-                    }
-                }
-
-            }
-
-            System.out.println(i);
+            ex.printStackTrace();
         }
     }
 

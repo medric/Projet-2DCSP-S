@@ -141,7 +141,7 @@ public class Optimization
             while (firstSolution.equals(secondSolution = this.getRandomSolutionOverCurrentPopulation())) ;
 
             // Performs crossover
-            this.performCrossover(firstSolution, secondSolution);
+            //this.performCrossover(firstSolution, secondSolution);
         }
 
         // Performs mutation
@@ -366,7 +366,7 @@ public class Optimization
      * @param individual Chosen individual
      * @throws Exception
      */
-    private void mutate(Solution individual) throws Exception {
+    private void mutate(Solution individual) throws  Exception {
         boolean add;
         boolean mutation = random.nextInt(this.mutationProbabilityIndex)==0;
         boolean canFitImage = false;
@@ -392,7 +392,8 @@ public class Optimization
                 chosenBin = individual.getBins().get(chosenBinId);
 
                 if (add) {
-                    newSolution = this.addImageToBin(individual, packing, chosenBinId, image);
+                    Rectangle newRectangle = new Rectangle(image);
+                    newSolution = this.addImageToBin(individual, packing, chosenBinId, newRectangle);
 
                     //newSolution is null if we can't add image to the chosen bin
                     canFitImage = newSolution != null;
@@ -401,11 +402,12 @@ public class Optimization
                     if(canFitImage) {
                         individual.setBins(newSolution.getBins());
                     }
+
                 // delete action chosen
                 } else {
                     chosenBin.getRectangles().remove(image);
 
-                    if(this.allImagesArePresent(individual)) {
+                    if (this.allImagesArePresent(individual)) {
                         chosenBin.getFreeRectangles().add(image);
                         canFitImage = true;
                     } else {

@@ -1,8 +1,11 @@
 import core.Optimization;
 import core.Solution;
+import models.Rectangle;
 import utils.DataModel;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import core.Packing;
 
@@ -10,8 +13,8 @@ import core.Packing;
  * Created by Medric on 18/04/2015.
  */
 public class Main {
-    static final File file = new File("./data/data_20Salpha.txt");
-    static final int numberOfGeneration = 50;
+    static final File file = new File("./data/data_20Lalpha.txt");
+    static final int numberOfGeneration = 1500;
     static final int populationSize = 6;
 
     public static void main(String[] args) {
